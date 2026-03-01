@@ -233,14 +233,18 @@ function generate(){
 }
 
 function handleGenerate(){
-  let panel = document.getElementById("panel");
 
-  if(panel.classList.contains("minimized")){
-    expand();   // buka panel dulu
+  let players = document.getElementById("players").value
+    .split("\n")
+    .map(p=>p.trim())
+    .filter(p=>p!="");
+
+  if(players.length < 4){
+    expand();   // buka panel supaya user isi dulu
     return;
   }
 
-  generate();   // kalau sudah terbuka baru generate
+  generate();   // langsung generate kalau sudah cukup
 }
   
 function loadMatch(){
