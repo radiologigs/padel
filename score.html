@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Padel Tournament Engine</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  overflow:hidden;
+}
+
+.container {
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+.teamA, .teamB {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:22vw;
+  font-weight:bold;
+}
+
+.teamA { background:black; color:white; }
+.teamB { background:white; color:black; }
+
+.controlPanel {
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(255,255,255,0.9);
+  padding:10px;
+  border-radius:10px;
+  font-size:12px;
+  z-index:1000;
+  max-width:90%;
+}
+
+textarea { width:100%; }
+
+table {
+  border-collapse:collapse;
+  width:100%;
+  font-size:12px;
+}
+th, td {
+  border:1px solid black;
+  padding:4px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="controlPanel">
+  Mode:
+  <select id="modeSelect" onchange="changeMode()">
+    <option value="tennis">Tennis</option>
+    <option value="americano">Americano 21</option>
+  </select>
+  <button onclick="resetScore()">Reset Score</button>
+  <hr>
+  <textarea id="playerList" rows="3" placeholder="Input nama (1 per baris)"></textarea>
+  <button onclick="generateAmericano()">Generate Americano</button>
+  <div id="matchOutput" style="max-height:150px;overflow:auto;"></div>
+</div>
+
+<div class="container">
+  <div class="teamA" id="scoreA">0</div>
+  <div class="teamB" id="scoreB">0</div>
+</div>
+
+<script>
+let mode="tennis";
+let tennisScores=[0,15,30,40];
+let indexA=0,indexB=0;
+let scoreA=0,scoreB=0;
+
+let playersData={};
+let matches=[];
+
+function changeMode(){ mode=document.getElementById("modeSelect").value; resetScore(); }
+
+function addPoint(team){
+  if(mode==="tennis"){
+    if(team==="A"){ indexA++; if(indexA>3){ alert("Game A"); resetScore(); return; } }
+    else{ indexB++; if(indexB>3){ alert("Game B"); resetScore(); return; } }
+  }
+  else{
+    if(team==="A"){ scoreA++; if(scoreA>=21){ alert("Win A"); resetScore(); return; } }
+    else{ scoreB++; if(scoreB>=21){ alert("Win B"); resetScore(); return; } }
+  }
+  updateScore();
+}
+
+function updateScore(){
+  if(mode==="tennis"){
+    scoreA=tennisScores[indexA];
+    scoreB=tennisScores[indexB];
+  }
+  document.getElementById("scoreA").innerText=scoreA;
+  document.getElementById("scoreB").innerText=scoreB;
+}
+
+function resetScore(){
+  indexA=0; indexB=0;
+  scoreA=0; scoreB=0;
+  updateScore();
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="a"||e.key==="A") addPoint("A");
+  if(e.key==="b"||e.key==="B") addPoint("B");
+  if(e.key==="r"||e.key==="R") resetScore();
+});
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function generateAmericano(){
+  let input=document.getElementById("playerList").value.trim();
+  let players=input.split("\n").map(p=>p.trim()).filter(p=>p);
+  if(players.length<4||players.length%2!==0){ alert("Genap min 4"); return; }
+
+  playersData={}; matches=[];
+  players.forEach(p=>playersData[p]={win:0,point:0,diff:0,match:0});
+  shuffle(players);
+
+  let n=players.length;
+  for(let r=0;r<n-1;r++){
+    for(let i=0;i<n/2;i++){
+      matches.push({
+        teamA:[players[i],players[(i+1)%(n-1)]],
+        teamB:[players[n-1-i],players[(n-2-i)%(n-1)]],
+        scoreA:null, scoreB:null
+      });
+    }
+    players.splice(1,0,players.pop());
+  }
+  renderMatches();
+}
+
+function renderMatches(){
+  let out="";
+  matches.forEach((m,i)=>{
+    out+=`
+      ${m.teamA[0]}&${m.teamA[1]} vs ${m.teamB[0]}&${m.teamB[1]}
+      <input type="number" id="a${i}" style="width:40px">
+      -
+      <input type="number" id="b${i}" style="width:40px">
+      <button onclick="submitScore(${i})">OK</button><br>`;
+  });
+  out+="<hr><div id='standing'></div>";
+  document.getElementById("matchOutput").innerHTML=out;
+}
+
+function submitScore(i){
+  let a=parseInt(document.getElementById("a"+i).value);
+  let b=parseInt(document.getElementById("b"+i).value);
+  if(isNaN(a)||isNaN(b)) return;
+  let m=matches[i];
+  m.scoreA=a; m.scoreB=b;
+
+  m.teamA.forEach(p=>{
+    playersData[p].point+=a;
+    playersData[p].diff+=(a-b);
+    playersData[p].match++;
+  });
+  m.teamB.forEach(p=>{
+    playersData[p].point+=b;
+    playersData[p].diff+=(b-a);
+    playersData[p].match++;
+  });
+
+  if(a>b) m.teamA.forEach(p=>playersData[p].win++);
+  else m.teamB.forEach(p=>playersData[p].win++);
+
+  renderStanding();
+}
+
+function renderStanding(){
+  let rank=Object.entries(playersData);
+  rank.sort((a,b)=>{
+    if(b[1].win!==a[1].win) return b[1].win-a[1].win;
+    if(b[1].diff!==a[1].diff) return b[1].diff-a[1].diff;
+    return b[1].point-a[1].point;
+  });
+
+  let t="<h4>Standing</h4><table><tr><th>Player</th><th>M</th><th>W</th><th>Pt</th><th>Diff</th></tr>";
+  rank.forEach(r=>{
+    t+=`<tr><td>${r[0]}</td><td>${r[1].match}</td><td>${r[1].win}</td><td>${r[1].point}</td><td>${r[1].diff}</td></tr>`;
+  });
+  t+="</table>";
+  document.getElementById("standing").innerHTML=t;
+}
+
+/* Landscape detect */
+const rotateOverlay=document.createElement("div");
+rotateOverlay.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;background:black;color:white;display:flex;justify-content:center;align-items:center;font-size:6vw;z-index:9999;";
+rotateOverlay.innerHTML="Rotate to Landscape 🔄";
+document.body.appendChild(rotateOverlay);
+
+function checkOrientation(){
+  if(window.innerHeight>window.innerWidth) rotateOverlay.style.display="flex";
+  else rotateOverlay.style.display="none";
+}
+window.addEventListener("load",checkOrientation);
+window.addEventListener("resize",checkOrientation);
+
+/* Wake lock */
+let wakeLock=null;
+async function requestWakeLock(){
+  try{ wakeLock=await navigator.wakeLock.request("screen"); }
+  catch(e){}
+}
+document.addEventListener("click",requestWakeLock);
+
+updateScore();
+</script>
+
+</body>
+</html>
