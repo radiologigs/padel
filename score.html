@@ -122,7 +122,7 @@ Mode:
 <option value="americano">Americano 21</option>
 </select>
 <button onclick="resetScore()">Reset</button>
-<button onclick="expand()">Generate</button>
+<button onclick="generate()">Generate</button>
 </div>
 
 <div class="scoreboard">
@@ -140,7 +140,7 @@ Mode:
     <textarea id="players" placeholder="1 nama per baris"></textarea>
     <button onclick="generate()">Generate</button>
   </div>
-  <div id="miniInfo">Tap to generate match</div>
+  <div id="miniInfo">Ready</div>
 </div>
 
 <div id="endOverlay">
@@ -287,13 +287,6 @@ document.addEventListener("click",function(e){
   let panel=document.getElementById("panel");
   if(!panel.classList.contains("minimized") && !panel.contains(e.target)){
     minimize();
-  }
-});
-
-document.getElementById("panel").addEventListener("click",function(e){
-  if(this.classList.contains("minimized")){
-    expand();
-    e.stopPropagation();
   }
 });
 
