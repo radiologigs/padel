@@ -8,14 +8,25 @@
 body{
   margin:0;
   font-family:Arial, sans-serif;
+  background:#000;
+  overflow:hidden;
+}
+
+.topbar{
+  position:fixed;
+  top:0;
+  width:100%;
   background:#111;
   color:white;
-  text-align:center;
+  padding:8px;
+  font-size:14px;
+  z-index:10;
 }
 
 .scoreboard{
   display:flex;
-  height:60vh;
+  flex-direction:column;
+  height:100vh;
 }
 
 .team{
@@ -37,21 +48,16 @@ body{
 }
 
 .score{
-  font-size:80px;
+  font-size:18vw;
   font-weight:bold;
 }
 
 button{
-  padding:10px 15px;
-  margin:5px;
-  font-size:16px;
+  padding:5px 10px;
+  margin:3px;
   border:none;
-  border-radius:6px;
+  border-radius:5px;
   cursor:pointer;
-}
-
-.controls{
-  padding:10px;
 }
 
 .panel{
@@ -61,10 +67,11 @@ button{
   transform:translate(-50%,-50%);
   background:#222;
   padding:20px;
-  border-radius:10px;
   width:90%;
   max-width:400px;
+  border-radius:10px;
   transition:0.3s;
+  color:white;
 }
 
 .panel.minimized{
@@ -73,77 +80,49 @@ button{
   left:0;
   transform:none;
   width:100%;
-  height:50px;
-  overflow:hidden;
+  height:40px;
   border-radius:0;
+  padding:5px 10px;
   display:flex;
   align-items:center;
-  justify-content:center;
+  font-size:14px;
 }
 
 textarea{
   width:100%;
   height:100px;
 }
-
-.match-row{
-  display:flex;
-  justify-content:center;
-  margin:5px 0;
-}
-
-input[type=number]{
-  width:50px;
-}
-
-.standing{
-  margin-top:10px;
-  font-size:14px;
-  max-height:150px;
-  overflow:auto;
-}
 </style>
 </head>
 
 <body>
 
+<div class="topbar">
+Mode:
+<select id="mode">
+<option value="tennis">Tennis 15-30-40</option>
+<option value="americano">Americano 21</option>
+</select>
+<button onclick="resetScore()">Reset</button>
+<button onclick="expand()">Generate</button>
+</div>
+
 <div class="scoreboard">
-  <div class="team teamA">
-    <div>Team A</div>
+  <div class="team teamA" onclick="addScore('A')">
     <div class="score" id="scoreA">0</div>
-    <button onclick="addScore('A')">+</button>
   </div>
-  <div class="team teamB">
-    <div>Team B</div>
+  <div class="team teamB" onclick="addScore('B')">
     <div class="score" id="scoreB">0</div>
-    <button onclick="addScore('B')">+</button>
   </div>
 </div>
 
-<div class="controls">
-  Mode:
-  <select id="mode">
-    <option value="tennis">Tennis 15-30-40</option>
-    <option value="americano">Americano 21</option>
-  </select>
-  <button onclick="resetScore()">Reset</button>
+<div class="panel minimized" id="panel">
+<div id="panelContent" style="display:none;">
+<h3>Generate Americano</h3>
+<textarea id="players"></textarea>
+<button onclick="generate()">Generate</button>
 </div>
-
-<div class="panel" id="panel">
-
-  <div id="panelContent">
-    <h3>Generate Americano</h3>
-    <textarea id="players" placeholder="Input nama player (1 per baris)"></textarea>
-    <br>
-    <button onclick="generate()">Generate</button>
-
-    <div id="matches"></div>
-
-    <div class="standing" id="standing"></div>
-  </div>
-
-  <div id="miniInfo" style="display:none;"></div>
-
+<div id="miniInfo">Tap to generate match</div>
 </div>
 
 <script>
@@ -151,9 +130,6 @@ input[type=number]{
 let scoreA=0;
 let scoreB=0;
 let matches=[];
-let players=[];
-let standings={};
-let currentMatchIndex=0;
 
 function addScore(team){
   let mode=document.getElementById("mode").value;
@@ -185,10 +161,10 @@ function resetScore(){
 }
 
 function generate(){
-  players=document.getElementById("players").value
-          .split("\n")
-          .map(p=>p.trim())
-          .filter(p=>p!=="");
+  let players=document.getElementById("players").value
+  .split("\n")
+  .map(p=>p.trim())
+  .filter(p=>p!="");
 
   if(players.length<4){
     alert("Minimal 4 player");
@@ -196,127 +172,37 @@ function generate(){
   }
 
   matches=[];
-  standings={};
-
-  players.forEach(p=>{
-    standings[p]={win:0,point:0,against:0,match:0};
-  });
-
   for(let i=0;i<players.length;i++){
     for(let j=i+1;j<players.length;j++){
       for(let k=j+1;k<players.length;k++){
         for(let l=k+1;l<players.length;l++){
-          matches.push([[players[i],players[j]],[players[k],players[l]]]);
+          matches.push(`${players[i]}&${players[j]} vs ${players[k]}&${players[l]}`);
         }
       }
     }
   }
 
-  renderMatches();
+  document.getElementById("miniInfo").innerText=
+  `Match 1/${matches.length} | ${matches[0]}`;
+
   minimize();
-}
-
-function renderMatches(){
-  let container=document.getElementById("matches");
-  container.innerHTML="";
-
-  matches.forEach((m,index)=>{
-    let div=document.createElement("div");
-    div.className="match-row";
-    div.innerHTML=`
-      ${m[0][0]}&${m[0][1]} vs ${m[1][0]}&${m[1][1]}
-      <input type="number" id="a${index}">
-      -
-      <input type="number" id="b${index}">
-      <button onclick="saveMatch(${index})">OK</button>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function saveMatch(i){
-  let a=parseInt(document.getElementById("a"+i).value);
-  let b=parseInt(document.getElementById("b"+i).value);
-
-  if(isNaN(a)||isNaN(b)) return;
-
-  let m=matches[i];
-
-  m[0].forEach(p=>{
-    standings[p].point+=a;
-    standings[p].against+=b;
-    standings[p].match++;
-  });
-
-  m[1].forEach(p=>{
-    standings[p].point+=b;
-    standings[p].against+=a;
-    standings[p].match++;
-  });
-
-  if(a>b) m[0].forEach(p=>standings[p].win++);
-  else m[1].forEach(p=>standings[p].win++);
-
-  renderStanding();
-  updateMiniInfo(i,a,b);
-}
-
-function renderStanding(){
-  let s=document.getElementById("standing");
-  let arr=Object.entries(standings);
-
-  arr.sort((a,b)=>{
-    if(b[1].win!==a[1].win)
-      return b[1].win-a[1].win;
-    return (b[1].point-b[1].against)-
-           (a[1].point-a[1].against);
-  });
-
-  s.innerHTML="<h4>Standing</h4>";
-  arr.forEach(p=>{
-    s.innerHTML+=`
-      ${p[0]} |
-      Win:${p[1].win} |
-      P:${p[1].point} |
-      Diff:${p[1].point-p[1].against} |
-      Match:${p[1].match}
-      <br>
-    `;
-  });
-}
-
-function updateMiniInfo(i,a,b){
-  let m=matches[i];
-  document.getElementById("miniInfo").innerHTML=
-    `Match ${i+1}/${matches.length} |
-     ${m[0][0]}&${m[0][1]} vs ${m[1][0]}&${m[1][1]}
-     | ${a}-${b}`;
 }
 
 function minimize(){
   let panel=document.getElementById("panel");
   panel.classList.add("minimized");
   document.getElementById("panelContent").style.display="none";
-  document.getElementById("miniInfo").style.display="block";
 }
 
 function expand(){
   let panel=document.getElementById("panel");
   panel.classList.remove("minimized");
   document.getElementById("panelContent").style.display="block";
-  document.getElementById("miniInfo").style.display="none";
 }
 
-document.getElementById("panel").addEventListener("click",function(e){
+document.getElementById("panel").addEventListener("click",function(){
   if(this.classList.contains("minimized")){
     expand();
-  }
-});
-
-document.addEventListener("click",function(e){
-  let panel=document.getElementById("panel");
-  if(!panel.contains(e.target) && !panel.classList.contains("minimized")){
-    minimize();
   }
 });
 
