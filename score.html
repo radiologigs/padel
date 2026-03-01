@@ -25,14 +25,13 @@ body{
 
 .scoreboard{
   display:flex;
-  flex-direction:column;
+  flex-direction:row;
   height:100vh;
 }
 
 .team{
   flex:1;
   display:flex;
-  flex-direction:column;
   justify-content:center;
   align-items:center;
 }
@@ -48,15 +47,15 @@ body{
 }
 
 .score{
-  font-size:18vw;
+  font-size:15vw;
   font-weight:bold;
 }
 
 button{
-  padding:5px 10px;
-  margin:3px;
+  padding:6px 12px;
+  margin:5px;
   border:none;
-  border-radius:5px;
+  border-radius:6px;
   cursor:pointer;
 }
 
@@ -92,6 +91,24 @@ textarea{
   width:100%;
   height:100px;
 }
+
+#endOverlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.9);
+  color:white;
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  font-size:10vw;
+  font-weight:bold;
+  z-index:999;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -117,94 +134,49 @@ Mode:
 </div>
 
 <div class="panel minimized" id="panel">
-<div id="panelContent" style="display:none;">
-<h3>Generate Americano</h3>
-<textarea id="players"></textarea>
-<button onclick="generate()">Generate</button>
+  <div id="panelContent" style="display:none;">
+    <h3>Generate Americano</h3>
+    <textarea id="players" placeholder="1 nama per baris"></textarea>
+    <button onclick="generate()">Generate</button>
+  </div>
+  <div id="miniInfo">Tap to generate match</div>
 </div>
-<div id="miniInfo">Tap to generate match</div>
-</div>
-<div id="endOverlay" style="
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.9);
-color:white;
-display:none;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-font-size:10vw;
-font-weight:bold;
-z-index:999;
-text-align:center;
-">
+
+<div id="endOverlay">
   END MATCH
   <div style="margin-top:20px;font-size:5vw;">
     <button onclick="nextMatch()">Next Match</button>
     <button onclick="goHome()">Home</button>
   </div>
 </div>
-  
+
 <script>
-  document.addEventListener("click", function(e){
-  let panel = document.getElementById("panel");
-
-  // kalau panel lagi expand
-  if(!panel.classList.contains("minimized")){
-
-    // kalau klik bukan di dalam panel
-    if(!panel.contains(e.target)){
-      minimize();
-    }
-  }
-});
-
-// klik bottom bar untuk expand
-document.getElementById("panel").addEventListener("click", function(e){
-
-  let panel = this;
-
-  if(panel.classList.contains("minimized")){
-    expand();
-    e.stopPropagation(); // penting biar gak langsung ke-trigger minimize lagi
-  }
-});
 
 let scoreA=0;
 let scoreB=0;
 let matches=[];
-let matchEnded = false;
-let currentMatchIndex = 0;
+let currentMatchIndex=0;
+let matchEnded=false;
+
+/* ================= SCORE ================= */
 
 function addScore(team){
-
   if(matchEnded) return;
 
   let mode=document.getElementById("mode").value;
 
   if(mode==="tennis"){
-
     let points=[0,15,30,40];
 
     if(team==="A"){
-      if(scoreA===40){
-        endMatch();
-        return;
-      }
+      if(scoreA===40){ endMatch(); return; }
       scoreA=points[Math.min(points.indexOf(scoreA)+1,3)];
     }else{
-      if(scoreB===40){
-        endMatch();
-        return;
-      }
+      if(scoreB===40){ endMatch(); return; }
       scoreB=points[Math.min(points.indexOf(scoreB)+1,3)];
     }
 
   }else{
-
     if(team==="A") scoreA++;
     else scoreB++;
 
@@ -216,53 +188,11 @@ function addScore(team){
   updateScore();
 }
 
-  function endMatch(){
-  matchEnded = true;
-  document.getElementById("endOverlay").style.display="flex";
-}
-
 function updateScore(){
   document.getElementById("scoreA").innerText=scoreA;
   document.getElementById("scoreB").innerText=scoreB;
 }
 
-  function loadMatch(){
-  if(matches.length === 0) return;
-
-  document.getElementById("miniInfo").innerText =
-  `Match ${currentMatchIndex+1}/${matches.length} | ${matches[currentMatchIndex]}`;
-
-  resetScore();
-}
-
-function nextMatch(){
-
-  currentMatchIndex++;
-
-  if(currentMatchIndex >= matches.length){
-    goHome();
-    return;
-  }
-
-  document.getElementById("endOverlay").style.display="none";
-  matchEnded = false;
-  loadMatch();
-}
-
-  function nextMatch(){
-
-  currentMatchIndex++;
-
-  if(currentMatchIndex >= matches.length){
-    goHome();
-    return;
-  }
-
-  document.getElementById("endOverlay").style.display="none";
-  matchEnded = false;
-  loadMatch();
-}
-  
 function resetScore(){
   scoreA=0;
   scoreB=0;
@@ -270,6 +200,8 @@ function resetScore(){
   updateScore();
   document.getElementById("endOverlay").style.display="none";
 }
+
+/* ================= MATCH SYSTEM ================= */
 
 function generate(){
   let players=document.getElementById("players").value
@@ -283,6 +215,7 @@ function generate(){
   }
 
   matches=[];
+
   for(let i=0;i<players.length;i++){
     for(let j=i+1;j<players.length;j++){
       for(let k=j+1;k<players.length;k++){
@@ -293,14 +226,49 @@ function generate(){
     }
   }
 
-  document.getElementById("miniInfo").innerText=
-  `Match 1/${matches.length} | ${matches[0]}`;
-
-    currentMatchIndex = 0;
+  currentMatchIndex=0;
   loadMatch();
-
   minimize();
 }
+
+function loadMatch(){
+  if(matches.length===0) return;
+
+  document.getElementById("miniInfo").innerText=
+  `Match ${currentMatchIndex+1}/${matches.length} | ${matches[currentMatchIndex]}`;
+
+  resetScore();
+}
+
+function nextMatch(){
+  currentMatchIndex++;
+
+  if(currentMatchIndex>=matches.length){
+    goHome();
+    return;
+  }
+
+  document.getElementById("endOverlay").style.display="none";
+  matchEnded=false;
+  loadMatch();
+}
+
+function goHome(){
+  document.getElementById("endOverlay").style.display="none";
+  matchEnded=false;
+  currentMatchIndex=0;
+  resetScore();
+  document.getElementById("miniInfo").innerText="Tap to generate match";
+}
+
+/* ================= OVERLAY ================= */
+
+function endMatch(){
+  matchEnded=true;
+  document.getElementById("endOverlay").style.display="flex";
+}
+
+/* ================= PANEL ================= */
 
 function minimize(){
   let panel=document.getElementById("panel");
@@ -314,9 +282,17 @@ function expand(){
   document.getElementById("panelContent").style.display="block";
 }
 
-document.getElementById("panel").addEventListener("click",function(){
+document.addEventListener("click",function(e){
+  let panel=document.getElementById("panel");
+  if(!panel.classList.contains("minimized") && !panel.contains(e.target)){
+    minimize();
+  }
+});
+
+document.getElementById("panel").addEventListener("click",function(e){
   if(this.classList.contains("minimized")){
     expand();
+    e.stopPropagation();
   }
 });
 
