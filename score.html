@@ -126,6 +126,29 @@ Mode:
 </div>
 
 <script>
+  document.addEventListener("click", function(e){
+  let panel = document.getElementById("panel");
+
+  // kalau panel lagi expand
+  if(!panel.classList.contains("minimized")){
+
+    // kalau klik bukan di dalam panel
+    if(!panel.contains(e.target)){
+      minimize();
+    }
+  }
+});
+
+// klik bottom bar untuk expand
+document.getElementById("panel").addEventListener("click", function(e){
+
+  let panel = this;
+
+  if(panel.classList.contains("minimized")){
+    expand();
+    e.stopPropagation(); // penting biar gak langsung ke-trigger minimize lagi
+  }
+});
 
 let scoreA=0;
 let scoreB=0;
