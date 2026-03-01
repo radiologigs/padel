@@ -122,7 +122,7 @@ Mode:
 <option value="americano">Americano 21</option>
 </select>
 <button onclick="resetScore()">Reset</button>
-<button onclick="generate()">Generate</button>
+<button onclick="handleGenerate()">Generate</button>
 </div>
 
 <div class="scoreboard">
@@ -232,6 +232,17 @@ function generate(){
   minimize();
 }
 
+function handleGenerate(){
+  let panel = document.getElementById("panel");
+
+  if(panel.classList.contains("minimized")){
+    expand();   // buka panel dulu
+    return;
+  }
+
+  generate();   // kalau sudah terbuka baru generate
+}
+  
 function loadMatch(){
   if(matches.length===0) return;
 
@@ -259,7 +270,7 @@ function goHome(){
   matchEnded=false;
   currentMatchIndex=0;
   resetScore();
-  document.getElementById("miniInfo").innerText="Tap to generate match";
+  document.getElementById("miniInfo").innerText="Ready";
 }
 
 /* ================= OVERLAY ================= */
