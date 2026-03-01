@@ -124,7 +124,24 @@ Mode:
 </div>
 <div id="miniInfo">Tap to generate match</div>
 </div>
-
+<div id="endOverlay" style="
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+color:white;
+display:none;
+justify-content:center;
+align-items:center;
+font-size:12vw;
+font-weight:bold;
+z-index:999;
+">
+END MATCH
+</div>
+  
 <script>
   document.addEventListener("click", function(e){
   let panel = document.getElementById("panel");
@@ -153,23 +170,48 @@ document.getElementById("panel").addEventListener("click", function(e){
 let scoreA=0;
 let scoreB=0;
 let matches=[];
+let matchEnded = false;
 
 function addScore(team){
+
+  if(matchEnded) return;
+
   let mode=document.getElementById("mode").value;
 
   if(mode==="tennis"){
+
     let points=[0,15,30,40];
+
     if(team==="A"){
+      if(scoreA===40){
+        endMatch();
+        return;
+      }
       scoreA=points[Math.min(points.indexOf(scoreA)+1,3)];
     }else{
+      if(scoreB===40){
+        endMatch();
+        return;
+      }
       scoreB=points[Math.min(points.indexOf(scoreB)+1,3)];
     }
+
   }else{
+
     if(team==="A") scoreA++;
     else scoreB++;
+
+    if(scoreA + scoreB === 21){
+      endMatch();
+    }
   }
 
   updateScore();
+}
+
+  function endMatch(){
+  matchEnded = true;
+  document.getElementById("endOverlay").style.display="flex";
 }
 
 function updateScore(){
@@ -180,7 +222,9 @@ function updateScore(){
 function resetScore(){
   scoreA=0;
   scoreB=0;
+  matchEnded=false;
   updateScore();
+  document.getElementById("endOverlay").style.display="none";
 }
 
 function generate(){
