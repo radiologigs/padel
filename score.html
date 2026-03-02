@@ -160,33 +160,40 @@ function generate() {
   
   if (p.length < 4) { alert("Min 4 players!"); return; }
 
-  // 1. Reset Stats
+  // 1. Inisialisasi playCount untuk semua pemain
   playerStats = {};
-  p.forEach(n => playerStats[n] = { wins: 0, losses: 0, points: 0, matches: 0, playCount: 0 });
+  p.forEach(n => {
+    playerStats[n] = { wins: 0, losses: 0, points: 0, matches: 0, playCount: 0 };
+  });
 
   let generatedMatches = [];
   
-  // 2. Loop sebanyak limit (misal 12 kali)
+  // 2. Loop sebanyak jumlah match yang dipilih (10-17)
   for (let m = 0; m < limit; m++) {
-    // Sort pemain berdasarkan jumlah main paling dikit (playCount)
-    let sortedByPlay = [...p].sort((a, b) => playerStats[a].playCount - playerStats[b].playCount);
-    
-    // Ambil 4 orang yang paling jarang main
-    let candidates = sortedByPlay.slice(0, 6); // Ambil 6 calon buat diacak biar gak monoton
-    candidates.sort(() => Math.random() - 0.5);
-    
-    let p1 = candidates[0];
-    let p2 = candidates[1];
-    let p3 = candidates[2];
-    let p4 = candidates[3];
+    // SORTIR: Cari pemain yang playCount-nya PALING KECIL
+    // Jika playCount sama, diacak dikit biar gak bosen
+    let sortedPlayers = [...p].sort((a, b) => {
+      if (playerStats[a].playCount !== playerStats[b].playCount) {
+        return playerStats[a].playCount - playerStats[b].playCount;
+      }
+      return Math.random() - 0.5; 
+    });
 
-    // Update playCount sementara buat keperluan loop ini
+    // AMBIL 4 ORANG TERATAS (yang paling jarang main)
+    let selected = sortedPlayers.slice(0, 4);
+    
+    // Acak posisi mereka biar partnernya ganti-ganti
+    selected.sort(() => Math.random() - 0.5);
+    
+    let p1 = selected[0], p2 = selected[1], p3 = selected[2], p4 = selected[3];
+
+    // Update playCount (catatan internal buat balancing)
     playerStats[p1].playCount++;
     playerStats[p2].playCount++;
     playerStats[p3].playCount++;
     playerStats[p4].playCount++;
 
-    // Gabungin jadi format match
+    // Masukin ke daftar match
     let t1 = [p1, p2].sort().join(" & ");
     let t2 = [p3, p4].sort().join(" & ");
     generatedMatches.push(`${t1} vs ${t2}`);
@@ -196,7 +203,7 @@ function generate() {
   matches = generatedMatches;
   currentMatchIndex = 0;
   
-  // Reset playCount beneran buat statistik leaderboard nanti
+  // Reset playCount beneran (statistik match di leaderboard pake playerStats[n].matches)
   p.forEach(n => playerStats[n].playCount = 0);
   
   loadMatch();
