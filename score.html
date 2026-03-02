@@ -204,14 +204,15 @@ function nextMatch() {
     currentMatchIndex = 0;
     document.getElementById("miniInfo").innerText = "Ready";
     document.getElementById("endOverlay").style.display = "none";
-    saveData();
+    
+    localStorage.removeItem('padelData'); 
     return;
   }
   loadMatch();
 }
 
 function loadMatch(){
-  if(!matches || matches.length === 0) {
+  if(!matches || matches.length === 0 || !matches[currentMatchIndex]) {
     document.getElementById("miniInfo").innerText = "Ready";
     return;
   }
