@@ -12,7 +12,7 @@ body{
   overflow:hidden;
 }
 
-.topbar{
+.topbar {
   position: fixed;
   top: 0;
   width: 100%;
@@ -23,18 +23,25 @@ body{
   z-index: 10;
   border-bottom: 1px solid #333;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Kontrol ke kiri, Info ke kanan */
   align-items: center;
   box-sizing: border-box;
 }
 
-  #miniInfo {
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Memberi jarak antar tombol secara rapi */
+}
+
+#miniInfo {
   font-weight: bold;
-  color: #00ff00; /* Kasih warna hijau biar kontras di pojok kanan */
+  color: #00ff00;
   font-family: monospace;
   background: #222;
   padding: 4px 10px;
   border-radius: 4px;
+  white-space: nowrap; /* Mencegah info match turun ke baris baru */
 }
 
 .scoreboard {
@@ -147,6 +154,7 @@ textarea{
 <body>
 
 <div class="topbar">
+  <div class="controls">
 Mode:
 <select id="mode">
 <option value="tennis">15-30-40</option>
