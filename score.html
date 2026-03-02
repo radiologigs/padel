@@ -2,151 +2,137 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Padel Scoreboard</title>
+<title>Padel Scoreboard Pro</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#000;
-  overflow:hidden;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #000;
+  overflow: hidden;
 }
 
+/* TOPBAR REFINED */
 .topbar {
   position: fixed;
   top: 0;
   width: 100%;
+  height: 50px;
   background: #111;
   color: white;
-  padding: 5px 15px;
-  font-size: 14px;
-  z-index: 10;
-  border-bottom: 1px solid #333;
+  padding: 0 15px;
   display: flex;
-  justify-content: space-between; /* Kontrol ke kiri, Info ke kanan */
+  justify-content: space-between; /* Kiri & Kanan */
   align-items: center;
+  z-index: 100;
+  border-bottom: 1px solid #333;
   box-sizing: border-box;
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 5px; /* Memberi jarak antar tombol secara rapi */
+  gap: 8px;
 }
 
 #miniInfo {
   font-weight: bold;
   color: #00ff00;
-  font-family: monospace;
+  font-family: 'Courier New', Courier, monospace;
   background: #222;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 4px;
-  white-space: nowrap; /* Mencegah info match turun ke baris baru */
+  white-space: nowrap;
+  font-size: 13px;
 }
 
+/* SCOREBOARD REFINED */
 .scoreboard {
   display: flex;
-  flex-direction: row;
+  width: 100vw;
   height: 100vh;
-  width: 100vw; /* Paksa lebar penuh viewport */
-  position: absolute; /* Pastikan dia nempel ke koordinat 0,0 */
+  position: absolute;
   top: 0;
   left: 0;
 }
 
-.team{
+.team {
   flex: 1;
   width: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
   cursor: pointer;
+  overflow: hidden;
   position: relative;
 }
 
-.teamA{
-  background:black;
-  color:white;
-}
+.teamA { background: black; color: white; }
+.teamB { background: white; color: black; }
 
-.teamB{
-  background:white;
-  color:black;
-}
-
-.score{
-  font-size: 44vw; 
+.score {
+  font-size: 32vw; /* Ukuran aman untuk 2 digit */
   font-weight: bold;
   line-height: 1;
   user-select: none;
   text-align: center;
-  width: 100%;
-  white-space: nowrap; /* Paksa angka tetep satu baris */
 }
 
-button{
-  padding:6px 12px;
-  margin:5px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
+/* UI ELEMENTS */
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   background: #444;
   color: white;
+  font-size: 12px;
 }
 
-button:active {
-  background: #666;
-}
+button:active { background: #666; }
 
-.panel{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:#222;
-  padding:20px;
-  width:90%;
-  max-width:400px;
-  border-radius:10px;
-  transition:0.3s;
-  color:white;
-  z-index: 100;
+.panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  color: white;
+  z-index: 1000;
   border: 1px solid #444;
+  box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
 
-.panel.minimized{
-  display: none;
-}
-
-textarea{
-  width:100%;
-  height:100px;
+textarea {
+  width: 100%;
+  height: 120px;
   margin: 10px 0;
   background: #333;
   color: white;
   border: 1px solid #555;
-  border-radius: 5px;
-  padding: 5px;
+  border-radius: 6px;
+  padding: 8px;
   box-sizing: border-box;
 }
 
-#endOverlay{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.9);
-  color:white;
-  display:none;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  font-size:10vw;
-  font-weight:bold;
-  z-index:999;
-  text-align:center;
+#endOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
+  color: white;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 </style>
 </head>
@@ -155,14 +141,15 @@ textarea{
 
 <div class="topbar">
   <div class="controls">
-Mode:
-<select id="mode">
-<option value="tennis">15-30-40</option>
-<option value="americano">21 Point</option>
-</select>
-<button onclick="resetScore()">Reset</button>
-<button onclick="handleGenerate(event)">Generate</button>
-<button onclick="toggleFullscreen()" style="background: #555;">Full Screen</button>
+    <span style="font-size: 12px; color: #888;">Mode:</span>
+    <select id="mode" style="background:#333; color:white; border:none; padding:4px; border-radius:4px;">
+      <option value="tennis">Tennis</option>
+      <option value="americano">Americano</option>
+    </select>
+    <button onclick="resetScore()">Reset</button>
+    <button onclick="handleGenerate(event)" style="background: #28a745;">Generate</button>
+    <button onclick="toggleFullscreen()" style="background: #555;">Full Screen</button>
+  </div>
   <div id="miniInfo">Ready</div>
 </div>
 
@@ -175,54 +162,39 @@ Mode:
   </div>
 </div>
 
-<div class="panel minimized" id="panel">
-  <div id="panelContent" style="display:none;">
-    <h3 style="margin-top:0;">Generate Americano</h3>
-    <textarea id="players" placeholder="Masukkan 1 nama per baris (Min 4)"></textarea>
-    <button onclick="generate()" style="background: #28a745; width: 100%;">Mulai Match</button>
-  </div>
-  <div id="miniInfo">Ready</div>
+<div class="panel" id="panel" style="display:none;">
+    <h3 style="margin-top:0;">Americano Setup</h3>
+    <textarea id="players" placeholder="Masukkan nama pemain per baris..."></textarea>
+    <button onclick="generate()" style="background: #28a745; width: 100%; padding: 10px; font-weight: bold;">START MATCH</button>
+    <button onclick="hidePanel()" style="background: transparent; width: 100%; margin-top: 5px; color: #888;">Cancel</button>
 </div>
 
 <div id="endOverlay">
-  END MATCH
-  <div style="margin-top:20px;font-size:5vw;">
-    <button onclick="nextMatch()" style="background:#007bff; font-size: 20px;">Next Match</button>
-    <button onclick="goHome()" style="background:#dc3545; font-size: 20px;">Home</button>
+  <h1 style="font-size: 10vw;">MATCH END</h1>
+  <div style="margin-top:20px;">
+    <button onclick="nextMatch()" style="background:#007bff; padding: 15px 30px; font-size: 20px;">Next Match</button>
+    <button onclick="goHome()" style="background:#dc3545; padding: 15px 30px; font-size: 20px; margin-left: 10px;">Home</button>
   </div>
 </div>
 
 <script>
-
-let scoreA=0;
-let scoreB=0;
-let matches=[];
-let currentMatchIndex=0;
-let matchEnded=false;
-
-/* ================= SCORE ================= */
+let scoreA=0, scoreB=0, matches=[], currentMatchIndex=0, matchEnded=false;
 
 function addScore(team){
   if(matchEnded) return;
-
   let mode=document.getElementById("mode").value;
-
   if(mode==="tennis"){
-    let points=[0,15,30,40];
+    let p=[0,15,30,40];
     if(team==="A"){
       if(scoreA===40){ endMatch(); return; }
-      scoreA=points[Math.min(points.indexOf(scoreA)+1,3)];
+      scoreA=p[Math.min(p.indexOf(scoreA)+1,3)];
     }else{
       if(scoreB===40){ endMatch(); return; }
-      scoreB=points[Math.min(points.indexOf(scoreB)+1,3)];
+      scoreB=p[Math.min(p.indexOf(scoreB)+1,3)];
     }
   }else{
-    if(team==="A") scoreA++;
-    else scoreB++;
-
-    if(scoreA + scoreB === 21){
-      endMatch();
-    }
+    if(team==="A") scoreA++; else scoreB++;
+    if(scoreA + scoreB === 21) endMatch();
   }
   updateScore();
 }
@@ -233,96 +205,53 @@ function updateScore(){
 }
 
 function resetScore(){
-  scoreA=0;
-  scoreB=0;
-  matchEnded=false;
+  scoreA=0; scoreB=0; matchEnded=false;
   updateScore();
   document.getElementById("endOverlay").style.display="none";
 }
 
-/* ================= MATCH SYSTEM ================= */
+function handleGenerate(e){
+  if(e) e.stopPropagation();
+  document.getElementById("panel").style.display="block";
+}
+
+function hidePanel(){
+  document.getElementById("panel").style.display="none";
+}
 
 function generate(){
-  let players=document.getElementById("players").value
-  .split("\n")
-  .map(p=>p.trim())
-  .filter(p=>p!="");
-
-  if(players.length<4){
-    alert("Minimal harus ada 4 player!");
-    return;
-  }
-
+  let p=document.getElementById("players").value.split("\n").map(n=>n.trim()).filter(n=>n!="");
+  if(p.length<4){ alert("Minimal 4 pemain!"); return; }
+  
   matches=[];
-  // Logic matchmaking sederhana
-  for(let i=0;i<players.length;i++){
-    for(let j=i+1;j<players.length;j++){
-      for(let k=j+1;k<players.length;k++){
-        for(let l=k+1;l<players.length;l++){
-          matches.push(`${players[i]} & ${players[j]} vs ${players[k]} & ${players[l]}`);
-        }
-      }
-    }
-  }
-
+  for(let i=0;i<p.length;i++)
+    for(let j=i+1;j<p.length;j++)
+      for(let k=j+1;k<p.length;k++)
+        for(let l=k+1;l<p.length;l++)
+          matches.push(`${p[i]} & ${p[j]} vs ${p[k]} & ${p[l]}`);
+  
   currentMatchIndex=0;
   loadMatch();
-  minimize();
+  hidePanel();
 }
 
-// FIXED: Penambahan event parameter dan stopPropagation
-function handleGenerate(event){
-  if(event) event.stopPropagation();
-
-  let panel = document.getElementById("panel");
-
-  if(panel.classList.contains("minimized")){
-    expand();
-  } else {
-    // Kalau sudah terbuka, tombol ini bisa juga berfungsi untuk trigger generate
-    generate();
-  }
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    // Masuk ke mode Fullscreen
-    document.documentElement.requestFullscreen().catch(err => {
-      alert(`Error gagal fullscreen: ${err.message}`);
-    });
-  } else {
-    // Keluar dari mode Fullscreen
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
-}
-  
 function loadMatch(){
   if(matches.length===0) return;
-  document.getElementById("miniInfo").innerText=
-  `Match ${currentMatchIndex+1}/${matches.length} | ${matches[currentMatchIndex]}`;
+  document.getElementById("miniInfo").innerText=`Match ${currentMatchIndex+1}/${matches.length} | ${matches[currentMatchIndex]}`;
   resetScore();
 }
 
 function nextMatch(){
   currentMatchIndex++;
-  if(currentMatchIndex>=matches.length){
-    alert("Semua pertandingan selesai!");
-    goHome();
-    return;
-  }
-  document.getElementById("endOverlay").style.display="none";
-  matchEnded=false;
+  if(currentMatchIndex>=matches.length){ goHome(); return; }
   loadMatch();
 }
 
 function goHome(){
-  document.getElementById("endOverlay").style.display="none";
-  matchEnded=false;
-  currentMatchIndex=0;
   resetScore();
+  currentMatchIndex=0;
   document.getElementById("miniInfo").innerText="Ready";
+  document.getElementById("endOverlay").style.display="none";
 }
 
 function endMatch(){
@@ -330,30 +259,21 @@ function endMatch(){
   document.getElementById("endOverlay").style.display="flex";
 }
 
-/* ================= PANEL LOGIC ================= */
-
-function minimize(){
-  let panel=document.getElementById("panel");
-  panel.classList.add("minimized");
-  document.getElementById("panelContent").style.display="none";
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+  }
 }
 
-function expand(){
-  let panel=document.getElementById("panel");
-  panel.classList.remove("minimized");
-  document.getElementById("panelContent").style.display="block";
-}
-
-// Menutup panel saat klik area hitam, tapi tidak saat klik di dalam panel
-document.addEventListener("click",function(e){
-  let panel=document.getElementById("panel");
-  let isClickInside = panel.contains(e.target);
-
-  if(!panel.classList.contains("minimized") && !isClickInside){
-    minimize();
+// Close panel if click outside
+document.addEventListener("click", function(e){
+  let p = document.getElementById("panel");
+  if(p.style.display==="block" && !p.contains(e.target) && !e.target.onclick){
+    hidePanel();
   }
 });
-
 </script>
 
 </body>
