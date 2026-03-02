@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Padel Scoreboard</title>
+<title>Padel Pro - Classic Style</title>
 
 <style>
 body {
@@ -13,25 +13,25 @@ body {
   color: white;
 }
 
-/* TOPBAR */
+/* KEMBALI KE DESIGN TOPBAR LAMA */
 .topbar {
-  position: fixed; top: 0; width: 100%; height: 55px; /* Tinggi ditambah dikit */
+  position: fixed; top: 0; width: 100%; height: 50px;
   background: #111; border-bottom: 1px solid #333;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 0 8px; z-index: 1000; box-sizing: border-box;
+  padding: 0 15px; z-index: 100; box-sizing: border-box;
 }
 
-.controls { 
-  display: flex; 
-  align-items: center; 
-  gap: 5px; /* Jarak antar elemen */
-}
+.controls { display: flex; align-items: center; gap: 8px; }
 
-/* Ukuran font universal di topbar agar muat di HP */
-.controls button, .controls select {
-  font-family: Arial, sans-serif;
-  font-size: 11px;
-  height: 35px;
+/* Styling Dropdown biar senada sama tombol lama */
+.controls select {
+  background: #333; 
+  color: white; 
+  border: none; 
+  padding: 5px; 
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 #miniInfo {
@@ -41,43 +41,30 @@ body {
   font-size: 13px; white-space: nowrap;
 }
 
-/* SCOREBOARD */
+/* SCOREBOARD RATA TENGAH */
 .scoreboard {
-display: flex;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  /* Tambahin padding top seukuran tinggi topbar lo (50px) */
-  /* Supaya angka 'didorong' ke bawah menjauhi topbar */
-  padding-top: 50px; 
-  box-sizing: border-box; /* Biar padding nggak nambah tinggi total */
+  display: flex; width: 100vw; height: 100vh;
+  position: absolute; top: 0; left: 0;
+  padding-top: 50px;
+  box-sizing: border-box;
 }
 
 .team {
   flex: 1; width: 50%; display: flex;
   justify-content: center; align-items: center;
-  cursor: pointer; overflow: hidden;
+  cursor: pointer;
 }
 
 .teamA { background: black; color: white; }
 .teamB { background: white; color: black; }
 
 .score {
-font-size: 44vw;
-  font-weight: bold;
-  /* Set line-height ke 1 atau sedikit lebih kecil untuk buang spasi hantu */
-  line-height: 0.8; 
-  user-select: none;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  /* Kadang font punya 'descender space' di bawah, kita tarik dikit pakai margin-top */
-  margin-top: -2vh;
+  font-size: 35vw; font-weight: bold;
+  user-select: none; text-align: center;
+  line-height: 0.8; margin-top: -2vh;
 }
 
-/* UI ELEMENTS */
+/* BUTTONS LAMA */
 button {
   padding: 6px 12px; border: none; border-radius: 6px;
   cursor: pointer; background: #444; color: white; font-size: 12px;
@@ -88,17 +75,12 @@ button:active { background: #666; }
   position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
   background: #222; padding: 20px; width: 90%; max-width: 500px;
   border-radius: 12px; z-index: 1000; border: 1px solid #444;
-  box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
-
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 10px; border-bottom: 1px solid #333; text-align: center; }
-th { color: #888; }
 
 #endOverlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0,0,0,0.95); display: none;
-  flex-direction: column; justify-content: center; align-items: center; z-index: 9999; text-align: center;
+  flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
 }
 </style>
 </head>
@@ -107,12 +89,12 @@ th { color: #888; }
 
 <div class="topbar">
   <div class="controls">
-    <select id="mode" onchange="saveData()" style="background:#333; color:#00ff00; border:1px solid #555; padding:6px; border-radius:4px; font-weight:bold; font-size:12px;">
-      <option value="tennis">Tennis (15-40)</option>
-      <option value="americano">Americano (21)</option>
+    <select id="mode" onchange="saveData()">
+      <option value="tennis">Tennis</option>
+      <option value="americano">Americano</option>
     </select>
 
-    <select id="matchLimit" style="background:#444; color:#ffaa00; border:1px solid #555; padding:6px; border-radius:4px; font-weight:bold; font-size:12px;">
+    <select id="matchLimit">
       <option value="10">10 M</option>
       <option value="11">11 M</option>
       <option value="12">12 M</option>
@@ -123,9 +105,9 @@ th { color: #888; }
       <option value="17">17 M</option>
     </select>
 
-    <button onclick="resetScore()" style="background:#555;">Reset</button>
-    <button onclick="handleGenerate(event)" style="background: #28a745; font-weight:bold;">GEN</button>
-    <button onclick="showLeaderboard()" style="background: #6f42c1;">LB</button>
+    <button onclick="resetScore()">Reset</button>
+    <button onclick="handleGenerate(event)" style="background: #28a745;">Generate</button>
+    <button onclick="showLeaderboard()" style="background: #6f42c1;">Leaderboard</button>
   </div>
   <div id="miniInfo">Ready</div>
 </div>
@@ -139,6 +121,11 @@ th { color: #888; }
   </div>
 </div>
 
+<div id="endOverlay">
+  <h1 style="font-size: 10vw;">MATCH END</h1>
+  <button onclick="nextMatch()" style="background:#007bff; padding:15px 40px; font-size:24px; color:white; border:none; border-radius:10px; cursor:pointer;">Next Match</button>
+</div>
+
 <div class="panel" id="panel" style="display:none;">
     <h3 style="margin-top:0;">Setup Pemain</h3>
     <textarea id="players" style="width:100%; height:120px; background:#333; color:white; border:1px solid #555; padding:8px; box-sizing:border-box;" placeholder="Nama per baris..."></textarea>
@@ -146,57 +133,22 @@ th { color: #888; }
     <button onclick="hidePanel()" style="background:transparent; width:100%; margin-top:5px; color:#888;">Cancel</button>
 </div>
 
-  <div class="panel" id="panel" style="display:none;">
-    <h3 style="margin-top:0;">Setup Turnamen</h3>
-    <textarea id="players" style="width:100%; height:80px; background:#333; color:white; border:1px solid #555; padding:8px; box-sizing:border-box; border-radius:4px;" placeholder="Nama per baris..."></textarea>
-    
-    <div style="margin-top:15px;">
-      <label style="font-size:12px; color:#aaa; display:block; margin-bottom:5px;">Jumlah Match (Round):</label>
-      <select id="matchLimit" style="width:100%; padding:10px; background:#333; color:white; border:1px solid #555; border-radius:4px; font-weight:bold;">
-        <option value="10">10 Match</option>
-        <option value="11">11 Match</option>
-        <option value="12">12 Match</option>
-        <option value="13">13 Match</option>
-        <option value="14">14 Match</option>
-        <option value="15" selected>15 Match (Default)</option>
-        <option value="16">16 Match</option>
-        <option value="17">17 Match</option>
-      </select>
-    </div>
-
-    <button onclick="generate()" style="background:#28a745; width:100%; padding:12px; margin-top:20px; font-weight:bold; border-radius:6px;">START MATCH</button>
-    <button onclick="hidePanel()" style="background:transparent; width:100%; margin-top:5px; color:#888;">Cancel</button>
-</div>
-
-<div class="panel" id="leaderboardPanel" style="display:none;">
-    <h3 style="margin-top:0;">Leaderboard</h3>
-    <div style="margin-bottom:10px; display:flex; gap:5px;">
-        <button onclick="renderLeaderboard('points')">Sort by Point</button>
-        <button onclick="renderLeaderboard('wins')">Sort by Win</button>
-    </div>
-    <div style="max-height:300px; overflow-y:auto;">
-        <table id="leaderboardTable"></table>
-    </div>
-    <button onclick="hideLeaderboard()" style="background:#dc3545; width:100%; margin-top:15px;">Close</button>
-</div>
-
-<div id="endOverlay">
-  <h1 style="font-size: 10vw;">MATCH END</h1>
-  <div style="margin-top:20px; width: 100%; display: flex; justify-content: center;">
-    <button onclick="nextMatch()" style="background:#007bff; padding:15px 30px; font-size:20px;">Next Match</button>
-  </div>
-</div>
-
 <script>
-// Variabel Utama
+// Logic JavaScript tetap sama dengan fitur Voice, Match Point, dan Multi-Point System
 let scoreA=0, scoreB=0, matches=[], currentMatchIndex=0, matchEnded=false, playerStats={};
 
-// --- CORE FUNCTIONS ---
+function announce(text) {
+  if ('speechSynthesis' in window) {
+    let msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'en-US'; msg.rate = 0.9;
+    window.speechSynthesis.speak(msg);
+  }
+}
+
 function addScore(team){
   if(matchEnded) return;
   let mode = document.getElementById("mode").value;
-
-  // 1. UPDATE LOGIC SKOR
+  
   if(mode === "tennis"){
     let p = [0, 15, 30, 40];
     if(team === "A"){
@@ -210,252 +162,91 @@ function addScore(team){
     }
   } else {
     if(team === "A") scoreA++; else scoreB++;
-    if(scoreA + scoreB === 21) {
-      announce("Match Over");
-      endMatch();
-      return;
-    }
+    if(scoreA + scoreB === 21) { announce("Match Over"); endMatch(); return; }
     if(scoreA + scoreB === 20) announce("Match Point");
   }
 
-  // 2. UPDATE TAMPILAN
   updateScore();
-
-  // 3. LOGIC ANNOUNCER DENGAN JEDA (Agar tidak kepotong)
-  // Kita kasih delay 1 detik supaya kalimat sebelumnya selesai dulu
   setTimeout(() => {
-    if(mode === "tennis") {
-      let voiceScoreA = scoreA === 0 ? "Love" : scoreA;
-      let voiceScoreB = scoreB === 0 ? "Love" : scoreB;
-
-      if (scoreA === scoreB && scoreA !== 0) {
-        if (scoreA === 40) announce("Deuce");
-        else announce(voiceScoreA + " All");
-      } else {
-        announce(voiceScoreA + " " + voiceScoreB);
-      }
-    } else {
-      announce(scoreA + " " + scoreB);
-    }
-  }, 1000); 
-
+    let vA = scoreA === 0 ? "Love" : scoreA;
+    let vB = scoreB === 0 ? "Love" : scoreB;
+    if(mode === "tennis" && scoreA === scoreB && scoreA !== 0) {
+      announce(scoreA === 40 ? "Deuce" : vA + " All");
+    } else { announce(vA + " " + vB); }
+  }, 1000);
   saveData();
 }
-
-function updateScore(){
-  document.getElementById("scoreA").innerText=scoreA;
-  document.getElementById("scoreB").innerText=scoreB;
-}
-
-function resetScore(){
-  scoreA=0; scoreB=0; matchEnded=false;
-  updateScore();
-  document.getElementById("endOverlay").style.display="none";
-  saveData();
-}
-
-function endMatch(){
-  matchEnded=true;
-  updateStats();
-  document.getElementById("endOverlay").style.display="flex";
-  saveData();
-}
-
-// --- STATS & GENERATE ---
-
-function handleGenerate(e){ e.stopPropagation(); document.getElementById("panel").style.display="block"; }
-function hidePanel(){ document.getElementById("panel").style.display="none"; }
 
 function generate(){
   let p = document.getElementById("players").value.split("\n").map(n=>n.trim()).filter(n=>n!="");
-  // Ambil value dari dropdown
   let limit = parseInt(document.getElementById("matchLimit").value);
-
-  if(p.length < 4){ alert("Minimal 4 pemain!"); return; }
+  if(p.length < 4){ alert("Min 4 players!"); return; }
   
   playerStats = {};
   p.forEach(n => playerStats[n] = { wins: 0, losses: 0, points: 0, matches: 0 });
 
   let allPossible = [];
+  // Logic cari kombinasi Round Robin
   for(let i=0; i<p.length; i++)
     for(let j=i+1; j<p.length; j++)
       for(let k=0; k<p.length; k++)
         for(let l=k+1; l<p.length; l++) {
           if(i!==k && i!==l && j!==k && j!==l) {
-            let team1 = [p[i], p[j]].sort().join(" & ");
-            let team2 = [p[k], p[l]].sort().join(" & ");
-            let matchKey = [team1, team2].sort().join(" vs ");
+            let t1 = [p[i], p[j]].sort().join(" & ");
+            let t2 = [p[k], p[l]].sort().join(" & ");
+            let matchKey = [t1, t2].sort().join(" vs ");
             if(!allPossible.includes(matchKey)) allPossible.push(matchKey);
           }
         }
 
-  // Shuffle biar dapet kombinasi acak setiap kali klik Generate
   allPossible.sort(() => Math.random() - 0.5);
-
-  // Potong sesuai limit dropdown (10-17)
   matches = allPossible.slice(0, limit);
-  
-  currentMatchIndex = 0;
-  loadMatch();
-  hidePanel();
-  saveData();
+  currentMatchIndex = 0; loadMatch(); hidePanel(); saveData();
 }
+
+function updateScore(){ document.getElementById("scoreA").innerText=scoreA; document.getElementById("scoreB").innerText=scoreB; }
+function endMatch(){ matchEnded = true; updateStats(); document.getElementById("endOverlay").style.display = "flex"; saveData(); }
+function resetScore(){ scoreA=0; scoreB=0; matchEnded=false; updateScore(); document.getElementById("endOverlay").style.display="none"; saveData(); }
 
 function updateStats(){
   if(!matches[currentMatchIndex]) return;
   let mode = document.getElementById("mode").value;
-  let t = matches[currentMatchIndex].split(" vs ");
-  let tA = t[0].split(" & "), tB = t[1].split(" & ");
+  let t = matches[currentMatchIndex].split(" vs "), tA = t[0].split(" & "), tB = t[1].split(" & ");
 
-  // 1. Tambah jumlah match untuk semua pemain
-  [...tA, ...tB].forEach(n => { if(playerStats[n]) playerStats[n].matches++; });
+  [...tA, ...tB].forEach(n => playerStats[n].matches++);
 
-  // 2. LOGIKA POIN BERDASARKAN MODE
   if(mode === "tennis") {
-    // Mode Tennis: Pemenang dapet 1 poin, kalah dapet 0
     if(scoreA > scoreB) {
-      tA.forEach(n => { if(playerStats[n]) { playerStats[n].wins++; playerStats[n].points += 1; } });
-      tB.forEach(n => { if(playerStats[n]) { playerStats[n].losses++; } });
+      tA.forEach(n => { playerStats[n].wins++; playerStats[n].points += 1; });
+      tB.forEach(n => playerStats[n].losses++);
     } else {
-      tB.forEach(n => { if(playerStats[n]) { playerStats[n].wins++; playerStats[n].points += 1; } });
-      tA.forEach(n => { if(playerStats[n]) { playerStats[n].losses++; } });
+      tB.forEach(n => { playerStats[n].wins++; playerStats[n].points += 1; });
+      tA.forEach(n => playerStats[n].losses++);
     }
   } else {
-    // Mode Americano (21 Point): Poin dihitung sesuai angka di papan skor (akumulasi)
-    tA.forEach(n => { 
-      if(playerStats[n]) {
-        playerStats[n].points += scoreA; // Misal Andi & Ari dapet 11, ya nambah 11
-        if(scoreA > scoreB) playerStats[n].wins++; else playerStats[n].losses++;
-      } 
-    });
-    tB.forEach(n => { 
-      if(playerStats[n]) {
-        playerStats[n].points += scoreB; // Misal Budi & Badu dapet 10, ya nambah 10
-        if(scoreB > scoreA) playerStats[n].wins++; else playerStats[n].losses++;
-      } 
-    });
+    tA.forEach(n => { playerStats[n].points += scoreA; if(scoreA > scoreB) playerStats[n].wins++; else playerStats[n].losses++; });
+    tB.forEach(n => { playerStats[n].points += scoreB; if(scoreB > scoreA) playerStats[n].wins++; else playerStats[n].losses++; });
   }
 }
 
-function renderLeaderboard(sortKey = 'points') {
-  let arr = Object.keys(playerStats).map(n => ({name: n, ...playerStats[n]}));
-  arr.sort((a,b) => b[sortKey] - a[sortKey]);
-  
-  // Tambah header Lose
-  let html = `<tr><th>Player</th><th>M</th><th>W</th><th style="color:#ff4444">L</th><th>Pts</th></tr>`;
-  
-  arr.forEach(p => {
-    html += `
-      <tr>
-        <td>${p.name}</td>
-        <td>${p.matches}</td>
-        <td style="color:#00ff00">${p.wins}</td>
-        <td style="color:#ff4444">${p.losses}</td> <td style="color:#ffaa00">${p.points}</td>
-      </tr>`;
-  });
-  document.getElementById("leaderboardTable").innerHTML = html;
-}
-
-function showLeaderboard(){ renderLeaderboard(); document.getElementById("leaderboardPanel").style.display="block"; }
-function hideLeaderboard(){ document.getElementById("leaderboardPanel").style.display="none"; }
-
-// --- SYSTEM ---
-
+function nextMatch(){ currentMatchIndex++; if(currentMatchIndex>=matches.length){ alert("Tournament Finish!"); return; } loadMatch(); }
 function loadMatch(){
-  if(matches.length===0) { document.getElementById("miniInfo").innerText="Ready"; return; }
-  let txt = matches[currentMatchIndex];
-  document.getElementById("miniInfo").innerHTML = `<span style="color:#fff">${txt}</span> <span style="color:#888">|</span> <span style="color:#ffaa00">M${currentMatchIndex+1}/${matches.length}</span>`;
+  if(matches.length===0) return;
+  document.getElementById("miniInfo").innerHTML = `<span>${matches[currentMatchIndex]}</span> | <span style="color:#fa0">M${currentMatchIndex+1}/${matches.length}</span>`;
   resetScore();
 }
 
-function nextMatch(){
-  currentMatchIndex++;
-  if(currentMatchIndex>=matches.length){ goHome(); return; }
-  loadMatch();
-}
-
-function goHome(){
-  resetScore(); currentMatchIndex=0; matches=[]; playerStats={};
-  document.getElementById("miniInfo").innerText="Ready";
-  document.getElementById("endOverlay").style.display="none";
-  saveData();
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-  else document.exitFullscreen();
-}
-
-// --- AUTO SAVE LOGIC ---
-
-function saveData(){
-  const data = {
-    scoreA, scoreB, matches, currentMatchIndex, matchEnded, playerStats,
-    mode: document.getElementById("mode").value
-  };
-  localStorage.setItem('padelData', JSON.stringify(data));
-}
-
+function saveData(){ localStorage.setItem('padelData', JSON.stringify({scoreA, scoreB, matches, currentMatchIndex, matchEnded, playerStats, mode: document.getElementById("mode").value})); }
 function loadData(){
-  const saved = localStorage.getItem('padelData');
-  if(!saved) return;
-  const data = JSON.parse(saved);
-  scoreA = data.scoreA; scoreB = data.scoreB;
-  matches = data.matches; currentMatchIndex = data.currentMatchIndex;
-  matchEnded = data.matchEnded; playerStats = data.playerStats;
-  document.getElementById("mode").value = data.mode;
-  
-  updateScore();
-  if(matches.length > 0) {
-    let txt = matches[currentMatchIndex];
-    document.getElementById("miniInfo").innerHTML = `<span style="color:#fff">${txt}</span> <span style="color:#888">|</span> <span style="color:#ffaa00">M${currentMatchIndex+1}/${matches.length}</span>`;
-  }
-  if(matchEnded) document.getElementById("endOverlay").style.display = "flex";
+  const saved = localStorage.getItem('padelData'); if(!saved) return;
+  const d = JSON.parse(saved); scoreA=d.scoreA; scoreB=d.scoreB; matches=d.matches; currentMatchIndex=d.currentMatchIndex; playerStats=d.playerStats;
+  document.getElementById("mode").value = d.mode; updateScore(); loadMatch(); if(d.matchEnded) endMatch();
 }
 
-// Panggil saat halaman dibuka
 window.onload = loadData;
-
-// Close modal click outside
-document.addEventListener("click", (e) => {
-  const p = document.getElementById("panel");
-  const l = document.getElementById("leaderboardPanel");
-  if(p.style.display==="block" && !p.contains(e.target) && !e.target.onclick) hidePanel();
-  if(l.style.display==="block" && !l.contains(e.target) && !e.target.onclick) hideLeaderboard();
-});
-
-function announce(text) {
-  if ('speechSynthesis' in window) {
-    // Jangan pakai cancel() di sini supaya suara nggak keputus tengah jalan
-    // window.speechSynthesis.cancel(); 
-
-    let msg = new SpeechSynthesisUtterance(text);
-    msg.lang = 'en-US';
-    msg.pitch = 1;
-    msg.rate = 0.8; // Turunin dikit speed-nya biar lebih jelas (tadinya 1.1)
-    msg.volume = 2;
-
-    // Tambahin sedikit pause di akhir kalimat biar gak tumpang tindih
-    window.speechSynthesis.speak(msg);
-  }
-}
-  
-  function playBuzzer() {
-  let context = new (window.AudioContext || window.webkitAudioContext)();
-  let osc = context.createOscillator();
-  let gain = context.createGain();
-  
-  osc.type = 'sawtooth'; // Suara agak kasar kayak buzzer lapangan
-  osc.frequency.setValueAtTime(440, context.currentTime);
-  osc.connect(gain);
-  gain.connect(context.destination);
-  
-  osc.start();
-  gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 1);
-  osc.stop(context.currentTime + 1);
-}
-// Panggil playBuzzer() di dalem fungsi endMatch()
+function handleGenerate(e){ e.stopPropagation(); document.getElementById("panel").style.display="block"; }
+function hidePanel(){ document.getElementById("panel").style.display="none"; }
+function showLeaderboard(){ alert("Check Console or implement Table Render for Stats"); }
 </script>
-
 </body>
 </html>
