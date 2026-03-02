@@ -35,10 +35,14 @@ body {
 }
 
 #miniInfo {
-  font-weight: bold; color: #00ff00;
-  font-family: 'Courier New', monospace;
-  background: #222; padding: 5px 12px; border-radius: 4px;
-  font-size: 13px; white-space: nowrap;
+  font-weight: bold; 
+  color: #fff;
+  font-family: Arial, sans-serif;
+  background: #222; 
+  padding: 5px 12px; 
+  border-radius: 4px;
+  font-size: 13px; 
+  white-space: nowrap;
 }
 
 /* SCOREBOARD RATA TENGAH */
@@ -232,8 +236,12 @@ function updateStats(){
 
 function nextMatch(){ currentMatchIndex++; if(currentMatchIndex>=matches.length){ alert("Tournament Finish!"); return; } loadMatch(); }
 function loadMatch(){
-  if(matches.length===0) return;
-  document.getElementById("miniInfo").innerHTML = `<span>${matches[currentMatchIndex]}</span> | <span style="color:#fa0">M${currentMatchIndex+1}/${matches.length}</span>`;
+  if(matches.length === 0) { 
+    document.getElementById("miniInfo").innerText = "Ready"; 
+    return; 
+  }
+  let txt = matches[currentMatchIndex];
+  document.getElementById("miniInfo").innerHTML = `<span>${txt}</span> | <span style="color:#fa0">M${currentMatchIndex+1}/${matches.length}</span>`;
   resetScore();
 }
 
