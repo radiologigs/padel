@@ -150,23 +150,30 @@ let scoreA=0, scoreB=0, matches=[], currentMatchIndex=0, matchEnded=false, playe
 
 // --- CORE FUNCTIONS ---
 
-function addScore(team){
-  if(matchEnded) return;
-  let mode=document.getElementById("mode").value;
-  if(mode==="tennis"){
-    let p=[0,15,30,40];
-    if(team==="A"){
-      if(scoreA===40){ endMatch(); return; }
-      scoreA=p[Math.min(p.indexOf(scoreA)+1,3)];
+function addScore(team) {
+  if (matchEnded) return;
+  let mode = document.getElementById("mode").value;
+
+  if (mode === "tennis") {
+    let p = [0, 15, 30, 40];
+    if (team === "A") {
+      if (scoreA === 40) { announce("Game Point Team A"); endMatch(); return; }
+      scoreA = p[Math.min(p.indexOf(scoreA) + 1, 3)];
     } else {
-      if(scoreB===40){ endMatch(); return; }
-      scoreB=p[Math.min(p.indexOf(scoreB)+1,3)];
+      if (scoreB === 40) { announce("Game Point Team B"); endMatch(); return; }
+      scoreB = p[Math.min(p.indexOf(scoreB) + 1, 3)];
     }
   } else {
-    if(team==="A") scoreA++; else scoreB++;
-    if(scoreA + scoreB === 21) endMatch();
+    if (team === "A") scoreA++; else scoreB++;
+    if (scoreA + scoreB === 21) {
+       announce("Match Over!");
+       endMatch();
+    }
   }
+  
   updateScore();
+  // Panggil anouncer: "Fifteen Zero" atau "Ten Five"
+  announce(`${scoreA} ${scoreB}`); 
   saveData();
 }
 
@@ -305,6 +312,36 @@ document.addEventListener("click", (e) => {
   if(p.style.display==="block" && !p.contains(e.target) && !e.target.onclick) hidePanel();
   if(l.style.display==="block" && !l.contains(e.target) && !e.target.onclick) hideLeaderboard();
 });
+
+  function announce(text) {
+  // Cek apakah browser support
+  if ('speechSynthesis' in window) {
+    // Batalkan suara sebelumnya kalau user klik cepet banget
+    window.speechSynthesis.cancel();
+    
+    let msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'en-US'; // Pakai 'id-ID' kalau mau Bahasa Indonesia
+    msg.pitch = 1;
+    msg.rate = 1.1; // Sedikit dicepetin biar tegas
+    window.speechSynthesis.speak(msg);
+  }
+}
+  
+  function playBuzzer() {
+  let context = new (window.AudioContext || window.webkitAudioContext)();
+  let osc = context.createOscillator();
+  let gain = context.createGain();
+  
+  osc.type = 'sawtooth'; // Suara agak kasar kayak buzzer lapangan
+  osc.frequency.setValueAtTime(440, context.currentTime);
+  osc.connect(gain);
+  gain.connect(context.destination);
+  
+  osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 1);
+  osc.stop(context.currentTime + 1);
+}
+// Panggil playBuzzer() di dalem fungsi endMatch()
 </script>
 
 </body>
