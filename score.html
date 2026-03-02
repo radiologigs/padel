@@ -6,133 +6,72 @@
 
 <style>
 body {
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   font-family: Arial, sans-serif;
   background: #000;
   overflow: hidden;
-}
-
-/* TOPBAR REFINED */
-.topbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 50px;
-  background: #111;
   color: white;
-  padding: 0 15px;
-  display: flex;
-  justify-content: space-between; /* Kiri & Kanan */
-  align-items: center;
-  z-index: 100;
-  border-bottom: 1px solid #333;
-  box-sizing: border-box;
 }
 
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* TOPBAR */
+.topbar {
+  position: fixed; top: 0; width: 100%; height: 50px;
+  background: #111; border-bottom: 1px solid #333;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 15px; z-index: 100; box-sizing: border-box;
 }
+
+.controls { display: flex; align-items: center; gap: 8px; }
 
 #miniInfo {
-  font-weight: bold;
-  color: #00ff00;
-  font-family: 'Courier New', Courier, monospace;
-  background: #222;
-  padding: 5px 12px;
-  border-radius: 4px;
-  white-space: nowrap;
-  font-size: 13px;
+  font-weight: bold; color: #00ff00;
+  font-family: 'Courier New', monospace;
+  background: #222; padding: 5px 12px; border-radius: 4px;
+  font-size: 13px; white-space: nowrap;
 }
 
-/* SCOREBOARD REFINED */
+/* SCOREBOARD */
 .scoreboard {
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: flex; width: 100vw; height: 100vh;
+  position: absolute; top: 0; left: 0;
 }
 
 .team {
-  flex: 1;
-  width: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
+  flex: 1; width: 50%; display: flex;
+  justify-content: center; align-items: center;
+  cursor: pointer; overflow: hidden;
 }
 
 .teamA { background: black; color: white; }
 .teamB { background: white; color: black; }
 
 .score {
-  font-size: 44vw; /* Ukuran aman untuk 2 digit */
-  font-weight: bold;
-  line-height: 1;
-  user-select: none;
-  text-align: center;
+  font-size: 32vw; font-weight: bold;
+  user-select: none; text-align: center;
 }
 
 /* UI ELEMENTS */
 button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #444;
-  color: white;
-  font-size: 12px;
+  padding: 6px 12px; border: none; border-radius: 6px;
+  cursor: pointer; background: #444; color: white; font-size: 12px;
 }
-
 button:active { background: #666; }
 
 .panel {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #222;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  border-radius: 12px;
-  color: white;
-  z-index: 1000;
-  border: 1px solid #444;
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: #222; padding: 20px; width: 90%; max-width: 500px;
+  border-radius: 12px; z-index: 1000; border: 1px solid #444;
   box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
 
-textarea {
-  width: 100%;
-  height: 120px;
-  margin: 10px 0;
-  background: #333;
-  color: white;
-  border: 1px solid #555;
-  border-radius: 6px;
-  padding: 8px;
-  box-sizing: border-box;
-}
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { padding: 10px; border-bottom: 1px solid #333; text-align: center; }
+th { color: #888; }
 
 #endOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.95);
-  color: white;
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95); display: none;
+  flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
 }
 </style>
 </head>
@@ -141,13 +80,13 @@ textarea {
 
 <div class="topbar">
   <div class="controls">
-    <span style="font-size: 12px; color: #888;">Mode:</span>
-    <select id="mode" style="background:#333; color:white; border:none; padding:4px; border-radius:4px;">
+    <select id="mode" onchange="saveData()" style="background:#333; color:white; border:none; padding:4px; border-radius:4px;">
       <option value="tennis">Tennis</option>
       <option value="americano">Americano</option>
     </select>
     <button onclick="resetScore()">Reset</button>
     <button onclick="handleGenerate(event)" style="background: #28a745;">Generate</button>
+    <button onclick="showLeaderboard()" style="background: #6f42c1;">Leaderboard</button>
     <button onclick="toggleFullscreen()" style="background: #555;">Full Screen</button>
   </div>
   <div id="miniInfo">Ready</div>
@@ -163,22 +102,37 @@ textarea {
 </div>
 
 <div class="panel" id="panel" style="display:none;">
-    <h3 style="margin-top:0;">Americano Setup</h3>
-    <textarea id="players" placeholder="Masukkan nama pemain per baris..."></textarea>
-    <button onclick="generate()" style="background: #28a745; width: 100%; padding: 10px; font-weight: bold;">START MATCH</button>
-    <button onclick="hidePanel()" style="background: transparent; width: 100%; margin-top: 5px; color: #888;">Cancel</button>
+    <h3 style="margin-top:0;">Setup Pemain</h3>
+    <textarea id="players" style="width:100%; height:120px; background:#333; color:white; border:1px solid #555; padding:8px; box-sizing:border-box;" placeholder="Nama per baris..."></textarea>
+    <button onclick="generate()" style="background:#28a745; width:100%; padding:10px; margin-top:10px; font-weight:bold;">START MATCH</button>
+    <button onclick="hidePanel()" style="background:transparent; width:100%; margin-top:5px; color:#888;">Cancel</button>
+</div>
+
+<div class="panel" id="leaderboardPanel" style="display:none;">
+    <h3 style="margin-top:0;">Leaderboard</h3>
+    <div style="margin-bottom:10px; display:flex; gap:5px;">
+        <button onclick="renderLeaderboard('points')">Sort by Poin</button>
+        <button onclick="renderLeaderboard('wins')">Sort by Win</button>
+    </div>
+    <div style="max-height:300px; overflow-y:auto;">
+        <table id="leaderboardTable"></table>
+    </div>
+    <button onclick="hideLeaderboard()" style="background:#dc3545; width:100%; margin-top:15px;">Close</button>
 </div>
 
 <div id="endOverlay">
   <h1 style="font-size: 10vw;">MATCH END</h1>
   <div style="margin-top:20px;">
-    <button onclick="nextMatch()" style="background:#007bff; padding: 15px 30px; font-size: 20px;">Next Match</button>
-    <button onclick="goHome()" style="background:#dc3545; padding: 15px 30px; font-size: 20px; margin-left: 10px;">Home</button>
+    <button onclick="nextMatch()" style="background:#007bff; padding:15px 30px; font-size:20px;">Next Match</button>
+    <button onclick="goHome()" style="background:#dc3545; padding:15px 30px; font-size:20px; margin-left:10px;">Home</button>
   </div>
 </div>
 
 <script>
-let scoreA=0, scoreB=0, matches=[], currentMatchIndex=0, matchEnded=false;
+// Variabel Utama
+let scoreA=0, scoreB=0, matches=[], currentMatchIndex=0, matchEnded=false, playerStats={};
+
+// --- CORE FUNCTIONS ---
 
 function addScore(team){
   if(matchEnded) return;
@@ -188,15 +142,16 @@ function addScore(team){
     if(team==="A"){
       if(scoreA===40){ endMatch(); return; }
       scoreA=p[Math.min(p.indexOf(scoreA)+1,3)];
-    }else{
+    } else {
       if(scoreB===40){ endMatch(); return; }
       scoreB=p[Math.min(p.indexOf(scoreB)+1,3)];
     }
-  }else{
+  } else {
     if(team==="A") scoreA++; else scoreB++;
     if(scoreA + scoreB === 21) endMatch();
   }
   updateScore();
+  saveData();
 }
 
 function updateScore(){
@@ -208,21 +163,28 @@ function resetScore(){
   scoreA=0; scoreB=0; matchEnded=false;
   updateScore();
   document.getElementById("endOverlay").style.display="none";
+  saveData();
 }
 
-function handleGenerate(e){
-  if(e) e.stopPropagation();
-  document.getElementById("panel").style.display="block";
+function endMatch(){
+  matchEnded=true;
+  updateStats();
+  document.getElementById("endOverlay").style.display="flex";
+  saveData();
 }
 
-function hidePanel(){
-  document.getElementById("panel").style.display="none";
-}
+// --- STATS & GENERATE ---
+
+function handleGenerate(e){ e.stopPropagation(); document.getElementById("panel").style.display="block"; }
+function hidePanel(){ document.getElementById("panel").style.display="none"; }
 
 function generate(){
   let p=document.getElementById("players").value.split("\n").map(n=>n.trim()).filter(n=>n!="");
   if(p.length<4){ alert("Minimal 4 pemain!"); return; }
   
+  playerStats = {};
+  p.forEach(n => playerStats[n] = { wins: 0, points: 0, matches: 0 });
+
   matches=[];
   for(let i=0;i<p.length;i++)
     for(let j=i+1;j<p.length;j++)
@@ -235,24 +197,40 @@ function generate(){
   hidePanel();
 }
 
-function loadMatch(){
-  if(matches.length === 0) {
-    document.getElementById("miniInfo").innerHTML = "Ready";
-    return;
-  }
+function updateStats(){
+  if(!matches[currentMatchIndex]) return;
+  let teams = matches[currentMatchIndex].split(" vs ");
+  let teamANames = teams[0].split(" & ");
+  let teamBNames = teams[1].split(" & ");
 
-  // Ambil teks match saat ini, misal: "Budi & Andi vs Caca & Dedi"
-  let matchText = matches[currentMatchIndex];
+  [...teamANames, ...teamBNames].forEach(n => { if(playerStats[n]) playerStats[n].matches++; });
+  teamANames.forEach(n => { if(playerStats[n]) playerStats[n].points += scoreA; });
+  teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].points += scoreB; });
+
+  if(scoreA > scoreB) teamANames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
+  else if(scoreB > scoreA) teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
+}
+
+function renderLeaderboard(sortKey = 'points'){
+  let arr = Object.keys(playerStats).map(n => ({name: n, ...playerStats[n]}));
+  arr.sort((a,b) => b[sortKey] - a[sortKey]);
   
-  // Kita bungkus pake HTML biar bisa dikasih warna beda tiap tim
-  // Tim A (Putih/Ijo), VS (Abu-abu), Tim B (Putih/Ijo)
-  let formattedInfo = `
-    <span style="color: #fff;">${matchText}</span> 
-    <span style="color: #888; margin: 0 10px;">|</span> 
-    <span style="color: #ffaa00;">Match ${currentMatchIndex + 1}/${matches.length}</span>
-  `;
+  let html = `<tr><th>Player</th><th>Match</th><th>Win</th><th>Poin</th></tr>`;
+  arr.forEach(p => {
+    html += `<tr><td>${p.name}</td><td>${p.matches}</td><td style="color:#00ff00">${p.wins}</td><td style="color:#ffaa00">${p.points}</td></tr>`;
+  });
+  document.getElementById("leaderboardTable").innerHTML = html;
+}
 
-  document.getElementById("miniInfo").innerHTML = formattedInfo;
+function showLeaderboard(){ renderLeaderboard(); document.getElementById("leaderboardPanel").style.display="block"; }
+function hideLeaderboard(){ document.getElementById("leaderboardPanel").style.display="none"; }
+
+// --- SYSTEM ---
+
+function loadMatch(){
+  if(matches.length===0) { document.getElementById("miniInfo").innerText="Ready"; return; }
+  let txt = matches[currentMatchIndex];
+  document.getElementById("miniInfo").innerHTML = `<span style="color:#fff">${txt}</span> <span style="color:#888">|</span> <span style="color:#ffaa00">M${currentMatchIndex+1}/${matches.length}</span>`;
   resetScore();
 }
 
@@ -263,32 +241,53 @@ function nextMatch(){
 }
 
 function goHome(){
-  resetScore();
-  currentMatchIndex=0;
-  matches = [];
+  resetScore(); currentMatchIndex=0; matches=[]; playerStats={};
   document.getElementById("miniInfo").innerText="Ready";
   document.getElementById("endOverlay").style.display="none";
-}
-
-function endMatch(){
-  matchEnded=true;
-  document.getElementById("endOverlay").style.display="flex";
+  saveData();
 }
 
 function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else {
-    if (document.exitFullscreen) document.exitFullscreen();
-  }
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
 }
 
-// Close panel if click outside
-document.addEventListener("click", function(e){
-  let p = document.getElementById("panel");
-  if(p.style.display==="block" && !p.contains(e.target) && !e.target.onclick){
-    hidePanel();
+// --- AUTO SAVE LOGIC ---
+
+function saveData(){
+  const data = {
+    scoreA, scoreB, matches, currentMatchIndex, matchEnded, playerStats,
+    mode: document.getElementById("mode").value
+  };
+  localStorage.setItem('padelData', JSON.stringify(data));
+}
+
+function loadData(){
+  const saved = localStorage.getItem('padelData');
+  if(!saved) return;
+  const data = JSON.parse(saved);
+  scoreA = data.scoreA; scoreB = data.scoreB;
+  matches = data.matches; currentMatchIndex = data.currentMatchIndex;
+  matchEnded = data.matchEnded; playerStats = data.playerStats;
+  document.getElementById("mode").value = data.mode;
+  
+  updateScore();
+  if(matches.length > 0) {
+    let txt = matches[currentMatchIndex];
+    document.getElementById("miniInfo").innerHTML = `<span style="color:#fff">${txt}</span> <span style="color:#888">|</span> <span style="color:#ffaa00">M${currentMatchIndex+1}/${matches.length}</span>`;
   }
+  if(matchEnded) document.getElementById("endOverlay").style.display = "flex";
+}
+
+// Panggil saat halaman dibuka
+window.onload = loadData;
+
+// Close modal click outside
+document.addEventListener("click", (e) => {
+  const p = document.getElementById("panel");
+  const l = document.getElementById("leaderboardPanel");
+  if(p.style.display==="block" && !p.contains(e.target) && !e.target.onclick) hidePanel();
+  if(l.style.display==="block" && !l.contains(e.target) && !e.target.onclick) hideLeaderboard();
 });
 </script>
 
