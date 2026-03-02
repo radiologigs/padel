@@ -255,12 +255,28 @@ function loadMatch(){
 }
 
 function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
-function handleGenerate(e){ e.stopPropagation(); document.getElementById("panel").style.display="block"; }
+function handleGenerate(e){ 
+  e.stopPropagation(); 
+  hideLeaderboard();
+  document.getElementById("panel").style.display = "block"; 
+}
 function hidePanel(){ document.getElementById("panel").style.display="none"; }
 function showLeaderboard() {
+  hidePanel();
   renderLeaderboard();
   document.getElementById("leaderboardPanel").style.display = "block";
 }
+
+window.onclick = function(event) {
+  let panelSetup = document.getElementById("panel");
+  let panelLB = document.getElementById("leaderboardPanel");
+  
+  // Kalau yang diklik bukan bagian dari panel, tutup semua
+  if (event.target.classList.contains('team')) {
+    hidePanel();
+    hideLeaderboard();
+  }
+}  
 
 function hideLeaderboard() {
   document.getElementById("leaderboardPanel").style.display = "none";
