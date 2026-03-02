@@ -142,6 +142,7 @@ Mode:
 </select>
 <button onclick="resetScore()">Reset</button>
 <button onclick="handleGenerate(event)">Generate</button>
+<button onclick="toggleFullscreen()" style="background: #555;">Full Screen</button>
 </div>
 
 <div class="scoreboard">
@@ -259,6 +260,20 @@ function handleGenerate(event){
   } else {
     // Kalau sudah terbuka, tombol ini bisa juga berfungsi untuk trigger generate
     generate();
+  }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    // Masuk ke mode Fullscreen
+    document.documentElement.requestFullscreen().catch(err => {
+      alert(`Error gagal fullscreen: ${err.message}`);
+    });
+  } else {
+    // Keluar dari mode Fullscreen
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
   }
 }
   
