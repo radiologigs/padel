@@ -234,17 +234,26 @@ function generate(){
 
 function handleGenerate(){
 
+  let panel = document.getElementById("panel");
+
+  // kalau panel masih minimized → buka dulu
+  if(panel.classList.contains("minimized")){
+    expand();
+    return;
+  }
+
+  // kalau sudah terbuka → baru cek player
   let players = document.getElementById("players").value
     .split("\n")
     .map(p=>p.trim())
     .filter(p=>p!="");
 
   if(players.length < 4){
-    expand();   // buka panel supaya user isi dulu
+    alert("Minimal 4 player");
     return;
   }
 
-  generate();   // langsung generate kalau sudah cukup
+  generate();
 }
   
 function loadMatch(){
