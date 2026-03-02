@@ -34,22 +34,15 @@ body{
   left: 0;
 }
 
-.team {
+.team{
   flex: 1;
+  width: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Tambahin ini biar teks nggak kepotong kalau layarnya aneh */
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-.team{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  overflow: hidden;
   cursor: pointer;
+  position: relative;
 }
 
 .teamA{
@@ -63,10 +56,13 @@ body{
 }
 
 .score{
-  font-size:45vw;
-  font-weight:bold;
-  line-height:1;
+  font-size: 44vw; 
+  font-weight: bold;
+  line-height: 1;
   user-select: none;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap; /* Paksa angka tetep satu baris */
 }
 
 button{
