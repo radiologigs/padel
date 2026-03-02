@@ -228,6 +228,8 @@ function generate(){
   }
 
   currentMatchIndex=0;
+  document.getElementById("miniInfo").innerText =
+`Match 1/${matches.length} | ${matches[0]}`;
   loadMatch();
   minimize();
 }
