@@ -245,22 +245,38 @@ function handleGenerate(e){ e.stopPropagation(); document.getElementById("panel"
 function hidePanel(){ document.getElementById("panel").style.display="none"; }
 
 function generate(){
-  let p=document.getElementById("players").value.split("\n").map(n=>n.trim()).filter(n=>n!="");
-  if(p.length<4){ alert("Minimal 4 pemain!"); return; }
+  let p = document.getElementById("players").value.split("\n").map(n=>n.trim()).filter(n=>n!="");
+  // Ambil value dari dropdown
+  let limit = parseInt(document.getElementById("matchLimit").value);
+
+  if(p.length < 4){ alert("Minimal 4 pemain!"); return; }
   
   playerStats = {};
   p.forEach(n => playerStats[n] = { wins: 0, losses: 0, points: 0, matches: 0 });
 
-  matches=[];
-  for(let i=0;i<p.length;i++)
-    for(let j=i+1;j<p.length;j++)
-      for(let k=j+1;k<p.length;k++)
-        for(let l=k+1;l<p.length;l++)
-          matches.push(`${p[i]} & ${p[j]} vs ${p[k]} & ${p[l]}`);
+  let allPossible = [];
+  for(let i=0; i<p.length; i++)
+    for(let j=i+1; j<p.length; j++)
+      for(let k=0; k<p.length; k++)
+        for(let l=k+1; l<p.length; l++) {
+          if(i!==k && i!==l && j!==k && j!==l) {
+            let team1 = [p[i], p[j]].sort().join(" & ");
+            let team2 = [p[k], p[l]].sort().join(" & ");
+            let matchKey = [team1, team2].sort().join(" vs ");
+            if(!allPossible.includes(matchKey)) allPossible.push(matchKey);
+          }
+        }
+
+  // Shuffle biar dapet kombinasi acak setiap kali klik Generate
+  allPossible.sort(() => Math.random() - 0.5);
+
+  // Potong sesuai limit dropdown (10-17)
+  matches = allPossible.slice(0, limit);
   
-  currentMatchIndex=0;
+  currentMatchIndex = 0;
   loadMatch();
   hidePanel();
+  saveData();
 }
 
 function updateStats(){
