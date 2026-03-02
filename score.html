@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Padel Pro - Classic Style</title>
+<title>Padel Scoreboard</title>
 
 <style>
 body {
@@ -95,14 +95,15 @@ button:active { background: #666; }
     </select>
 
     <select id="matchLimit">
+      <option value="8">8 M</option>
+      <option value="9">9 M</option>
       <option value="10">10 M</option>
       <option value="11">11 M</option>
-      <option value="12">12 M</option>
+      <option value="12" selected>12 M</option>
       <option value="13">13 M</option>
       <option value="14">14 M</option>
-      <option value="15" selected>15 M</option>
+      <option value="15">15 M</option>
       <option value="16">16 M</option>
-      <option value="17">17 M</option>
     </select>
 
     <button onclick="resetScore()">Reset</button>
