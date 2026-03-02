@@ -15,13 +15,24 @@ body {
 
 /* TOPBAR */
 .topbar {
-  position: fixed; top: 0; width: 100%; height: 50px;
+  position: fixed; top: 0; width: 100%; height: 55px; /* Tinggi ditambah dikit */
   background: #111; border-bottom: 1px solid #333;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 0 15px; z-index: 100; box-sizing: border-box;
+  padding: 0 8px; z-index: 1000; box-sizing: border-box;
 }
 
-.controls { display: flex; align-items: center; gap: 8px; }
+.controls { 
+  display: flex; 
+  align-items: center; 
+  gap: 5px; /* Jarak antar elemen */
+}
+
+/* Ukuran font universal di topbar agar muat di HP */
+.controls button, .controls select {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  height: 35px;
+}
 
 #miniInfo {
   font-weight: bold; color: #00ff00;
@@ -96,14 +107,25 @@ th { color: #888; }
 
 <div class="topbar">
   <div class="controls">
-    <select id="mode" onchange="saveData()" style="background:#333; color:white; border:none; padding:4px; border-radius:4px;">
-      <option value="tennis">15-30-40</option>
-      <option value="americano">21 Points</option>
+    <select id="mode" onchange="saveData()" style="background:#333; color:#00ff00; border:1px solid #555; padding:6px; border-radius:4px; font-weight:bold; font-size:12px;">
+      <option value="tennis">Tennis (15-40)</option>
+      <option value="americano">Americano (21)</option>
     </select>
-    <button onclick="resetScore()">Reset</button>
-    <button onclick="handleGenerate(event)" style="background: #28a745;">Generate</button>
-    <button onclick="showLeaderboard()" style="background: #6f42c1;">Leaderboard</button>
-    <button onclick="toggleFullscreen()" style="background: #555;">Full Screen</button>
+
+    <select id="matchLimit" style="background:#444; color:#ffaa00; border:1px solid #555; padding:6px; border-radius:4px; font-weight:bold; font-size:12px;">
+      <option value="10">10 M</option>
+      <option value="11">11 M</option>
+      <option value="12">12 M</option>
+      <option value="13">13 M</option>
+      <option value="14">14 M</option>
+      <option value="15" selected>15 M</option>
+      <option value="16">16 M</option>
+      <option value="17">17 M</option>
+    </select>
+
+    <button onclick="resetScore()" style="background:#555;">Reset</button>
+    <button onclick="handleGenerate(event)" style="background: #28a745; font-weight:bold;">GEN</button>
+    <button onclick="showLeaderboard()" style="background: #6f42c1;">LB</button>
   </div>
   <div id="miniInfo">Ready</div>
 </div>
