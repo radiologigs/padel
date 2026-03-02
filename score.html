@@ -154,27 +154,54 @@ function addScore(team){
   saveData();
 }
 
-function generate(){
-  let p = document.getElementById("players").value.split("\n").map(n=>n.trim()).filter(n=>n!="");
+function generate() {
+  let p = document.getElementById("players").value.split("\n").map(n => n.trim()).filter(n => n != "");
   let limit = parseInt(document.getElementById("matchLimit").value);
-  if(p.length < 4){ alert("Min 4 players!"); return; }
+  
+  if (p.length < 4) { alert("Min 4 players!"); return; }
+
+  // 1. Reset Stats
   playerStats = {};
-  p.forEach(n => playerStats[n] = { wins: 0, losses: 0, points: 0, matches: 0 });
-  let allPossible = [];
-  for(let i=0; i<p.length; i++)
-    for(let j=i+1; j<p.length; j++)
-      for(let k=0; k<p.length; k++)
-        for(let l=k+1; l<p.length; l++) {
-          if(i!==k && i!==l && j!==k && j!==l) {
-            let t1 = [p[i], p[j]].sort().join(" & ");
-            let t2 = [p[k], p[l]].sort().join(" & ");
-            let matchKey = [t1, t2].sort().join(" vs ");
-            if(!allPossible.includes(matchKey)) allPossible.push(matchKey);
-          }
-        }
-  allPossible.sort(() => Math.random() - 0.5);
-  matches = allPossible.slice(0, limit);
-  currentMatchIndex = 0; loadMatch(); hidePanel(); saveData();
+  p.forEach(n => playerStats[n] = { wins: 0, losses: 0, points: 0, matches: 0, playCount: 0 });
+
+  let generatedMatches = [];
+  
+  // 2. Loop sebanyak limit (misal 12 kali)
+  for (let m = 0; m < limit; m++) {
+    // Sort pemain berdasarkan jumlah main paling dikit (playCount)
+    let sortedByPlay = [...p].sort((a, b) => playerStats[a].playCount - playerStats[b].playCount);
+    
+    // Ambil 4 orang yang paling jarang main
+    let candidates = sortedByPlay.slice(0, 6); // Ambil 6 calon buat diacak biar gak monoton
+    candidates.sort(() => Math.random() - 0.5);
+    
+    let p1 = candidates[0];
+    let p2 = candidates[1];
+    let p3 = candidates[2];
+    let p4 = candidates[3];
+
+    // Update playCount sementara buat keperluan loop ini
+    playerStats[p1].playCount++;
+    playerStats[p2].playCount++;
+    playerStats[p3].playCount++;
+    playerStats[p4].playCount++;
+
+    // Gabungin jadi format match
+    let t1 = [p1, p2].sort().join(" & ");
+    let t2 = [p3, p4].sort().join(" & ");
+    generatedMatches.push(`${t1} vs ${t2}`);
+  }
+
+  // 3. Finalisasi
+  matches = generatedMatches;
+  currentMatchIndex = 0;
+  
+  // Reset playCount beneran buat statistik leaderboard nanti
+  p.forEach(n => playerStats[n].playCount = 0);
+  
+  loadMatch();
+  hidePanel();
+  saveData();
 }
 
 function updateScore(){ document.getElementById("scoreA").innerText=scoreA; document.getElementById("scoreB").innerText=scoreB; }
