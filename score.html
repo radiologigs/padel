@@ -236,8 +236,23 @@ function generate(){
 }
 
 function loadMatch(){
-  if(matches.length===0) return;
-  document.getElementById("miniInfo").innerText=`Match ${currentMatchIndex+1}/${matches.length} | ${matches[currentMatchIndex]}`;
+  if(matches.length === 0) {
+    document.getElementById("miniInfo").innerHTML = "Ready";
+    return;
+  }
+
+  // Ambil teks match saat ini, misal: "Budi & Andi vs Caca & Dedi"
+  let matchText = matches[currentMatchIndex];
+  
+  // Kita bungkus pake HTML biar bisa dikasih warna beda tiap tim
+  // Tim A (Putih/Ijo), VS (Abu-abu), Tim B (Putih/Ijo)
+  let formattedInfo = `
+    <span style="color: #fff;">${matchText}</span> 
+    <span style="color: #888; margin: 0 10px;">|</span> 
+    <span style="color: #ffaa00;">Match ${currentMatchIndex + 1}/${matches.length}</span>
+  `;
+
+  document.getElementById("miniInfo").innerHTML = formattedInfo;
   resetScore();
 }
 
@@ -250,6 +265,7 @@ function nextMatch(){
 function goHome(){
   resetScore();
   currentMatchIndex=0;
+  matches = [];
   document.getElementById("miniInfo").innerText="Ready";
   document.getElementById("endOverlay").style.display="none";
 }
