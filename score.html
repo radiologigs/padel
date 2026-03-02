@@ -88,11 +88,16 @@ button:active { background: #666; }
   <div class="team teamB" onclick="addScore('B')"><div class="score" id="scoreB">0</div></div>
 </div>
 
-  <div class="panel" id="leaderboardPanel" style="display:none; max-width:600px;">
-    <h3 style="margin:0 0 15px 0; text-align:center; color:#ffaa00;">STANDINGS</h3>
-    <div style="max-height: 400px; overflow-y: auto;">
-      <table id="leaderboardTable" style="width:100%; border-collapse:collapse; font-size:14px;">
-        </table>
+<div class="panel" id="leaderboardPanel" style="display:none; max-width:600px;">
+    <h3 style="margin:0 0 10px 0; text-align:center; color:#ffaa00;">STANDINGS</h3>
+    
+    <div style="display:flex; gap:5px; margin-bottom:15px; justify-content:center;">
+        <button onclick="renderLeaderboard('points')" style="background:#333; flex:1; padding:8px; font-size:11px;">SORT BY PTS</button>
+        <button onclick="renderLeaderboard('wins')" style="background:#333; flex:1; padding:8px; font-size:11px;">SORT BY WIN</button>
+    </div>
+
+    <div style="max-height: 350px; overflow-y: auto;">
+      <table id="leaderboardTable" style="width:100%; border-collapse:collapse; font-size:14px;"></table>
     </div>
     <button onclick="hideLeaderboard()" style="background:#444; width:100%; padding:12px; margin-top:15px; border-radius:6px; font-weight:bold;">CLOSE</button>
 </div>
@@ -226,15 +231,15 @@ function hideLeaderboard() {
   document.getElementById("leaderboardPanel").style.display = "none";
 }
 
-function renderLeaderboard() {
-  // Ambil data playerStats, ubah jadi Array agar bisa di-sort
+function renderLeaderboard(sortKey = 'points') {
+  // 1. Ambil data playerStats
   let arr = Object.keys(playerStats).map(n => ({ name: n, ...playerStats[n] }));
   
-  // Urutkan berdasarkan Poin tertinggi (Pts)
-  arr.sort((a, b) => b.points - a.points);
+  // 2. LOGIKA SORTIR: Urutkan berdasarkan parameter yang diklik
+  arr.sort((a, b) => b[sortKey] - a[sortKey]);
 
   let html = `
-    <tr style="color:#888; font-size:11px; text-transform:uppercase;">
+    <tr style="color:#888; font-size:10px; text-transform:uppercase;">
       <th style="text-align:left; padding:10px;">Player</th>
       <th>M</th><th>W</th><th>L</th><th>Pts</th>
     </tr>`;
@@ -242,7 +247,7 @@ function renderLeaderboard() {
   arr.forEach(p => {
     html += `
       <tr style="border-bottom:1px solid #333;">
-        <td style="text-align:left; padding:12px 10px; font-weight:bold;">${p.name}</td>
+        <td style="text-align:left; padding:12px 10px; font-weight:bold; font-size:13px;">${p.name}</td>
         <td style="text-align:center;">${p.matches}</td>
         <td style="text-align:center; color:#0f0;">${p.wins}</td>
         <td style="text-align:center; color:#f44;">${p.losses}</td>
