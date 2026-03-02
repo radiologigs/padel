@@ -88,6 +88,15 @@ button:active { background: #666; }
   <div class="team teamB" onclick="addScore('B')"><div class="score" id="scoreB">0</div></div>
 </div>
 
+  <div class="panel" id="leaderboardPanel" style="display:none; max-width:600px;">
+    <h3 style="margin:0 0 15px 0; text-align:center; color:#ffaa00;">STANDINGS</h3>
+    <div style="max-height: 400px; overflow-y: auto;">
+      <table id="leaderboardTable" style="width:100%; border-collapse:collapse; font-size:14px;">
+        </table>
+    </div>
+    <button onclick="hideLeaderboard()" style="background:#444; width:100%; padding:12px; margin-top:15px; border-radius:6px; font-weight:bold;">CLOSE</button>
+</div>
+
 <div id="endOverlay">
   <h1 style="font-size: 10vw; margin-bottom: 30px;">MATCH END</h1>
   <button onclick="nextMatch()" style="background:#007bff; padding:15px 40px; font-size:24px; color:white; border:none; border-radius:10px; cursor:pointer;">Next Match</button>
@@ -181,13 +190,16 @@ function updateStats(){
   }
 }
 
-function nextMatch(){
+function nextMatch() {
   currentMatchIndex++;
-  if(currentMatchIndex >= matches.length){
-    alert("Tournament Finish!");
-    matches = []; currentMatchIndex = 0;
+  if (currentMatchIndex >= matches.length) {
+    showLeaderboard();
+    
+    matches = []; 
+    currentMatchIndex = 0;
     document.getElementById("miniInfo").innerText = "Ready";
     document.getElementById("endOverlay").style.display = "none";
+    saveData();
     return;
   }
   loadMatch();
@@ -205,7 +217,41 @@ function loadMatch(){
 function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 function handleGenerate(e){ e.stopPropagation(); document.getElementById("panel").style.display="block"; }
 function hidePanel(){ document.getElementById("panel").style.display="none"; }
-function showLeaderboard(){ alert("Logic Leaderboard Render dipanggil..."); }
+function showLeaderboard() {
+  renderLeaderboard();
+  document.getElementById("leaderboardPanel").style.display = "block";
+}
+
+function hideLeaderboard() {
+  document.getElementById("leaderboardPanel").style.display = "none";
+}
+
+function renderLeaderboard() {
+  // Ambil data playerStats, ubah jadi Array agar bisa di-sort
+  let arr = Object.keys(playerStats).map(n => ({ name: n, ...playerStats[n] }));
+  
+  // Urutkan berdasarkan Poin tertinggi (Pts)
+  arr.sort((a, b) => b.points - a.points);
+
+  let html = `
+    <tr style="color:#888; font-size:11px; text-transform:uppercase;">
+      <th style="text-align:left; padding:10px;">Player</th>
+      <th>M</th><th>W</th><th>L</th><th>Pts</th>
+    </tr>`;
+
+  arr.forEach(p => {
+    html += `
+      <tr style="border-bottom:1px solid #333;">
+        <td style="text-align:left; padding:12px 10px; font-weight:bold;">${p.name}</td>
+        <td style="text-align:center;">${p.matches}</td>
+        <td style="text-align:center; color:#0f0;">${p.wins}</td>
+        <td style="text-align:center; color:#f44;">${p.losses}</td>
+        <td style="text-align:center; color:#fa0; font-weight:bold;">${p.points}</td>
+      </tr>`;
+  });
+
+  document.getElementById("leaderboardTable").innerHTML = html;
+}
 
 function saveData(){ localStorage.setItem('padelData', JSON.stringify({scoreA, scoreB, matches, currentMatchIndex, matchEnded, playerStats, mode: document.getElementById("mode").value})); }
 function loadData(){
