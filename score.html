@@ -241,26 +241,39 @@ function generate(){
   hidePanel();
 }
 
-function updateStats() {
-  if (!matches[currentMatchIndex]) return;
-  let teams = matches[currentMatchIndex].split(" vs ");
-  let teamANames = teams[0].split(" & ");
-  let teamBNames = teams[1].split(" & ");
+function updateStats(){
+  if(!matches[currentMatchIndex]) return;
+  let mode = document.getElementById("mode").value;
+  let t = matches[currentMatchIndex].split(" vs ");
+  let tA = t[0].split(" & "), tB = t[1].split(" & ");
 
-  // Tambah jumlah match
-  [...teamANames, ...teamBNames].forEach(n => { if(playerStats[n]) playerStats[n].matches++; });
+  // 1. Tambah jumlah match untuk semua pemain
+  [...tA, ...tB].forEach(n => { if(playerStats[n]) playerStats[n].matches++; });
 
-  // Update Poin
-  teamANames.forEach(n => { if(playerStats[n]) playerStats[n].points += scoreA; });
-  teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].points += scoreB; });
-
-  // LOGIKA MENANG & KALAH
-  if (scoreA > scoreB) {
-    teamANames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
-    teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].losses++; }); // Tim B Kalah
-  } else if (scoreB > scoreA) {
-    teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
-    teamANames.forEach(n => { if(playerStats[n]) playerStats[n].losses++; }); // Tim A Kalah
+  // 2. LOGIKA POIN BERDASARKAN MODE
+  if(mode === "tennis") {
+    // Mode Tennis: Pemenang dapet 1 poin, kalah dapet 0
+    if(scoreA > scoreB) {
+      tA.forEach(n => { if(playerStats[n]) { playerStats[n].wins++; playerStats[n].points += 1; } });
+      tB.forEach(n => { if(playerStats[n]) { playerStats[n].losses++; } });
+    } else {
+      tB.forEach(n => { if(playerStats[n]) { playerStats[n].wins++; playerStats[n].points += 1; } });
+      tA.forEach(n => { if(playerStats[n]) { playerStats[n].losses++; } });
+    }
+  } else {
+    // Mode Americano (21 Point): Poin dihitung sesuai angka di papan skor (akumulasi)
+    tA.forEach(n => { 
+      if(playerStats[n]) {
+        playerStats[n].points += scoreA; // Misal Andi & Ari dapet 11, ya nambah 11
+        if(scoreA > scoreB) playerStats[n].wins++; else playerStats[n].losses++;
+      } 
+    });
+    tB.forEach(n => { 
+      if(playerStats[n]) {
+        playerStats[n].points += scoreB; // Misal Budi & Badu dapet 10, ya nambah 10
+        if(scoreB > scoreA) playerStats[n].wins++; else playerStats[n].losses++;
+      } 
+    });
   }
 }
 
