@@ -228,7 +228,7 @@ function generate(){
   if(p.length<4){ alert("Minimal 4 pemain!"); return; }
   
   playerStats = {};
-  p.forEach(n => playerStats[n] = { wins: 0, points: 0, matches: 0 });
+  p.forEach(n => playerStats[n] = { wins: 0, losses: 0, points: 0, matches: 0 });
 
   matches=[];
   for(let i=0;i<p.length;i++)
@@ -242,27 +242,44 @@ function generate(){
   hidePanel();
 }
 
-function updateStats(){
-  if(!matches[currentMatchIndex]) return;
+function updateStats() {
+  if (!matches[currentMatchIndex]) return;
   let teams = matches[currentMatchIndex].split(" vs ");
   let teamANames = teams[0].split(" & ");
   let teamBNames = teams[1].split(" & ");
 
+  // Tambah jumlah match
   [...teamANames, ...teamBNames].forEach(n => { if(playerStats[n]) playerStats[n].matches++; });
+
+  // Update Poin
   teamANames.forEach(n => { if(playerStats[n]) playerStats[n].points += scoreA; });
   teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].points += scoreB; });
 
-  if(scoreA > scoreB) teamANames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
-  else if(scoreB > scoreA) teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
+  // LOGIKA MENANG & KALAH
+  if (scoreA > scoreB) {
+    teamANames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
+    teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].losses++; }); // Tim B Kalah
+  } else if (scoreB > scoreA) {
+    teamBNames.forEach(n => { if(playerStats[n]) playerStats[n].wins++; });
+    teamANames.forEach(n => { if(playerStats[n]) playerStats[n].losses++; }); // Tim A Kalah
+  }
 }
 
-function renderLeaderboard(sortKey = 'points'){
+function renderLeaderboard(sortKey = 'points') {
   let arr = Object.keys(playerStats).map(n => ({name: n, ...playerStats[n]}));
   arr.sort((a,b) => b[sortKey] - a[sortKey]);
   
-  let html = `<tr><th>Player</th><th>Match</th><th>Win</th><th>Poin</th></tr>`;
+  // Tambah header Lose
+  let html = `<tr><th>Player</th><th>M</th><th>W</th><th style="color:#ff4444">L</th><th>Pts</th></tr>`;
+  
   arr.forEach(p => {
-    html += `<tr><td>${p.name}</td><td>${p.matches}</td><td style="color:#00ff00">${p.wins}</td><td style="color:#ffaa00">${p.points}</td></tr>`;
+    html += `
+      <tr>
+        <td>${p.name}</td>
+        <td>${p.matches}</td>
+        <td style="color:#00ff00">${p.wins}</td>
+        <td style="color:#ff4444">${p.losses}</td> <td style="color:#ffaa00">${p.points}</td>
+      </tr>`;
   });
   document.getElementById("leaderboardTable").innerHTML = html;
 }
