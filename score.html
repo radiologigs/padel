@@ -259,10 +259,39 @@ function renderLeaderboard(sortKey = 'points') {
 }
 
 function saveData(){ localStorage.setItem('padelData', JSON.stringify({scoreA, scoreB, matches, currentMatchIndex, matchEnded, playerStats, mode: document.getElementById("mode").value})); }
-function loadData(){
-  const saved = localStorage.getItem('padelData'); if(!saved) return;
-  const d = JSON.parse(saved); scoreA=d.scoreA; scoreB=d.scoreB; matches=d.matches; currentMatchIndex=d.currentMatchIndex; playerStats=d.playerStats;
-  document.getElementById("mode").value = d.mode; updateScore(); loadMatch(); if(d.matchEnded) endMatch();
+function loadData() {
+  const saved = localStorage.getItem('padelData');
+  
+  // Jika tidak ada data tersimpan, atau datanya kosong, tampilkan Ready
+  if (!saved) {
+    document.getElementById("miniInfo").innerText = "Ready";
+    return;
+  }
+  
+  const d = JSON.parse(saved);
+  
+  // Cek apakah turnamen sudah di-generate atau belum
+  if (!d.matches || d.matches.length === 0) {
+    document.getElementById("miniInfo").innerText = "Ready";
+    // Tetap reset score ke 0 biar sinkron
+    scoreA = 0; scoreB = 0;
+    updateScore();
+  } else {
+    // Jika ada turnamen aktif, baru tampilkan nama pemain
+    scoreA = d.scoreA; 
+    scoreB = d.scoreB; 
+    matches = d.matches; 
+    currentMatchIndex = d.currentMatchIndex; 
+    playerStats = d.playerStats;
+    document.getElementById("mode").value = d.mode;
+    
+    updateScore();
+    document.getElementById("miniInfo").innerHTML = `<span>${matches[currentMatchIndex]}</span> | <span style="color:#fa0">M${currentMatchIndex+1}/${matches.length}</span>`;
+    
+    if (d.matchEnded) {
+       document.getElementById("endOverlay").style.display = "flex";
+    }
+  }
 }
 window.onload = loadData;
 </script>
