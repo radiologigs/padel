@@ -172,7 +172,20 @@ function addScore(team) {
   }
   
   updateScore();
-  // Panggil anouncer: "Fifteen Zero" atau "Ten Five"
+
+let voiceScoreA = scoreA === 0 ? "Love" : scoreA;
+let voiceScoreB = scoreB === 0 ? "Love" : scoreB;
+
+if (scoreA === scoreB && scoreA !== 0) {
+    if (scoreA === 40) {
+        announce("Deuce");
+    } else {
+        announce(voiceScoreA + " All");
+    }
+} else {
+    // Format: "Fifteen Love" atau "Thirty Fifteen"
+    announce(voiceScoreA + " " + voiceScoreB);
+}
   announce(`${scoreA} ${scoreB}`); 
   saveData();
 }
@@ -313,16 +326,18 @@ document.addEventListener("click", (e) => {
   if(l.style.display==="block" && !l.contains(e.target) && !e.target.onclick) hideLeaderboard();
 });
 
-  function announce(text) {
-  // Cek apakah browser support
+function announce(text) {
   if ('speechSynthesis' in window) {
-    // Batalkan suara sebelumnya kalau user klik cepet banget
-    window.speechSynthesis.cancel();
-    
+    // Jangan pakai cancel() di sini supaya suara nggak keputus tengah jalan
+    // window.speechSynthesis.cancel(); 
+
     let msg = new SpeechSynthesisUtterance(text);
-    msg.lang = 'en-US'; // Pakai 'id-ID' kalau mau Bahasa Indonesia
+    msg.lang = 'en-US';
     msg.pitch = 1;
-    msg.rate = 1.1; // Sedikit dicepetin biar tegas
+    msg.rate = 0.9; // Turunin dikit speed-nya biar lebih jelas (tadinya 1.1)
+    msg.volume = 1;
+
+    // Tambahin sedikit pause di akhir kalimat biar gak tumpang tindih
     window.speechSynthesis.speak(msg);
   }
 }
